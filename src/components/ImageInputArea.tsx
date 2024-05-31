@@ -1,6 +1,4 @@
-// import { useState } from "react";
-
-import { DeleteIcon, PlusSquareIcon } from "@chakra-ui/icons";
+import { DeleteIcon, PlusSquareIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Center,
   Input,
@@ -11,67 +9,68 @@ import {
   Stack,
   Flex,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+// import useRecognizeFace from "../hooks/useRecognizeFace";
+import recognizeFace from "../functions/recognizeFace";
+import detectDeepfake from "../functions/detectDeepfake";
 
-const HiddenImageInputWithIcon = () => {
+const ImageInputArea = () => {
+  const [image, setImage] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isRecognizingFace, setIsRecognizingFace] = useState<boolean>(false);
   const [recognizedFaces, setRecognizedFaces] = useState<string[] | null>(null);
-  const [canvasUrl, setCanvasUrl] = useState<string | null>(null);
+  const [boundingBoxOverlaySrc, setboundingBoxOverlaySrc] = useState<
+    string | null
+  >(null);
+
+  const onStartRequest = async (image: File | null) => {
+    console.log("onStartRequest", image);
+    const loadImageBase64 = (image: File) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => {
+          console.log("Error: ", error);
+          reject(error);
+        };
+      });
+    };
+
+    if (image && imageSrc) {
+      const { data } = await detectDeepfake(imageSrc);
+      setIsRecognizingFace(true);
+      const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
+        image
+      );
+      setRecognizedFaces(recognizedFaces);
+      setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
+      console.log("deepfake detection result: ", data);
+    }
+    setIsRecognizingFace(false);
+  };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    console.log("file", file);
-    if (file) {
+    const uploadedImage = e.target.files?.[0];
+    if (uploadedImage) {
+      setImage(uploadedImage);
+    } else {
+      setImage(null);
+    }
+  };
+
+  useEffect(() => {
+    if (image) {
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result as string);
       };
-      reader.readAsDataURL(file);
-      recognizeFace(file);
+      reader.readAsDataURL(image);
     }
-  };
-
-  const recognizeFace = async (image: File) => {
-    console.log(image);
-    if (image) {
-      try {
-        setIsRecognizingFace(true);
-        const formData = new FormData();
-        formData.append("image", image);
-        console.log(import.meta.env.VITE_FACE_RECOGNITION_URI);
-        const response = await fetch(
-          `${import.meta.env.VITE_FACE_RECOGNITION_URI}`,
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-        const data = await response.json();
-        console.log(data);
-        const { matchResults, detection, canvasUrl } = data;
-        if (matchResults?.length) {
-          setRecognizedFaces(matchResults.map((e: any) => e._label));
-        } else {
-          console.log("No faces recognized");
-          setRecognizedFaces(null);
-        }
-
-        if (detection) {
-          //draw the bounding box
-        }
-        if (canvasUrl) {
-          setCanvasUrl(canvasUrl);
-        }
-
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsRecognizingFace(false);
-      }
+    if (!image) {
+      setImageSrc(null);
     }
-  };
+  }, [image]);
 
   return (
     <Stack>
@@ -79,20 +78,19 @@ const HiddenImageInputWithIcon = () => {
         <Input
           type="file"
           accept="image/*"
-          onChange={onImageChange}
+          onInput={onImageChange}
           display="none"
           id="image"
           name="image"
           position={"absolute"}
         />
-        {/* <canvas id="canvas" position={}></canvas> */}
 
         {imageSrc ? (
           <Box position={"relative"}>
             <img src={imageSrc} alt="preview" />
             <img
-              hidden={!canvasUrl}
-              src={canvasUrl || ""}
+              hidden={!boundingBoxOverlaySrc}
+              src={boundingBoxOverlaySrc || ""}
               id="overlay"
               style={{
                 position: "absolute",
@@ -120,12 +118,13 @@ const HiddenImageInputWithIcon = () => {
       </Center>
       <Box p={2}>
         {isRecognizingFace && <Spinner />}
-        {recognizedFaces?.length && (
+        {recognizedFaces?.length ? (
           <Flex gap={5}>
             <DeleteIcon
               onClick={() => {
-                setImageSrc(null);
+                setImage(null);
                 setRecognizedFaces(null);
+                setboundingBoxOverlaySrc(null);
               }}
               cursor="pointer"
               boxSize={6}
@@ -140,10 +139,20 @@ const HiddenImageInputWithIcon = () => {
               </Box>
             </Flex>
           </Flex>
+        ) : (
+          image &&
+          !isRecognizingFace && (
+            <SearchIcon
+              boxSize={6}
+              color="blue.500"
+              cursor="pointer"
+              onClick={() => onStartRequest(image)}
+            />
+          )
         )}
       </Box>
     </Stack>
   );
 };
 
-export default HiddenImageInputWithIcon;
+export default ImageInputArea;
