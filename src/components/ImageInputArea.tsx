@@ -16,38 +16,45 @@ import detectDeepfake from "../functions/detectDeepfake";
 
 const ImageInputArea = () => {
   const [image, setImage] = useState<File | null>(null);
+  const [deepfakePredictionResult, setDeepfakePredictionResult] = useState<{
+    isDeepfake: boolean;
+    confidence: number;
+  } | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [isRecognizingFace, setIsRecognizingFace] = useState<boolean>(false);
+  const [processingState, setProcessingState] = useState<
+    "IDLE" | "LOADING" | "COMPLETED" | ""
+  >("IDLE");
   const [recognizedFaces, setRecognizedFaces] = useState<string[] | null>(null);
   const [boundingBoxOverlaySrc, setboundingBoxOverlaySrc] = useState<
     string | null
   >(null);
 
   const onStartRequest = async (image: File | null) => {
-    console.log("onStartRequest", image);
-    const loadImageBase64 = (image: File) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(image);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => {
-          console.log("Error: ", error);
-          reject(error);
-        };
-      });
-    };
-
     if (image && imageSrc) {
-      const { data } = await detectDeepfake(imageSrc);
-      setIsRecognizingFace(true);
+      setProcessingState("LOADING");
+      const response = await detectDeepfake(imageSrc);
+      if (response?.predictions.length) {
+        const deepfakePrediction = response.predictions[0];
+        if (deepfakePrediction.class === "fake") {
+          setDeepfakePredictionResult({
+            isDeepfake: true,
+            confidence: deepfakePrediction.confidence,
+          });
+          setProcessingState("COMPLETED");
+        } else {
+          setDeepfakePredictionResult({
+            isDeepfake: false,
+            confidence: deepfakePrediction.confidence,
+          });
+        }
+      }
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
         image
       );
       setRecognizedFaces(recognizedFaces);
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
-      console.log("deepfake detection result: ", data);
+      setProcessingState("COMPLETED");
     }
-    setIsRecognizingFace(false);
   };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,7 +124,7 @@ const ImageInputArea = () => {
         )}
       </Center>
       <Box p={2}>
-        {isRecognizingFace && <Spinner />}
+        {processingState === "LOADING" && <Spinner />}
         {recognizedFaces?.length ? (
           <Flex gap={5}>
             <DeleteIcon
@@ -125,6 +132,7 @@ const ImageInputArea = () => {
                 setImage(null);
                 setRecognizedFaces(null);
                 setboundingBoxOverlaySrc(null);
+                setProcessingState("IDLE");
               }}
               cursor="pointer"
               boxSize={6}
@@ -141,7 +149,7 @@ const ImageInputArea = () => {
           </Flex>
         ) : (
           image &&
-          !isRecognizingFace && (
+          processingState === "IDLE" && (
             <SearchIcon
               boxSize={6}
               color="blue.500"
@@ -151,6 +159,21 @@ const ImageInputArea = () => {
           )
         )}
       </Box>
+      {deepfakePredictionResult && (
+        <Box>
+          {deepfakePredictionResult.isDeepfake ? (
+            <Text background="red.400" color="red.50">
+              This image is AI-generated with a confidence of{" "}
+              {deepfakePredictionResult.confidence.toPrecision(3)}
+            </Text>
+          ) : (
+            <Text>
+              This image is not AI-generated with a confidence of{" "}
+              {deepfakePredictionResult.confidence.toPrecision(3)}
+            </Text>
+          )}
+        </Box>
+      )}
     </Stack>
   );
 };
