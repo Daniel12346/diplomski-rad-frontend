@@ -13,7 +13,7 @@ import { useEffect } from "react";
 // import useRecognizeFace from "../hooks/useRecognizeFace";
 import recognizeFace from "../functions/recognizeFace";
 import detectDeepfake from "../functions/detectDeepfake";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {
   boundingBoxOverlaySrcState,
   deepfakePredictionResultState,
@@ -21,6 +21,9 @@ import {
   imageState,
   processingStatusState,
   recognizedFacesState,
+  shouldCheckDeepfakeState,
+  shouldRecognizeFaceState,
+  shouldSearchRelatedResultsState,
 } from "../recoil/state";
 
 const ImageInputArea = () => {
@@ -36,39 +39,69 @@ const ImageInputArea = () => {
   const [boundingBoxOverlaySrc, setboundingBoxOverlaySrc] = useRecoilState(
     boundingBoxOverlaySrcState
   );
+  const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
+  const shouldCheckDeepfake = useRecoilValue(shouldCheckDeepfakeState);
+  const shouldSearchRelatedResults = useRecoilValue(
+    shouldSearchRelatedResultsState
+  );
+
+  interface SearchSettings {
+    shouldRecognizeFace: boolean;
+    shouldCheckDeepfake: boolean;
+    shouldSearchRelatedResults: boolean;
+  }
 
   const onStartRequest = async (
     image: File | null,
-    imageSrc: string | null
+    imageSrc: string | null,
+    searchSettings: SearchSettings
   ) => {
     setProcessingStatus("LOADING");
-
+    //TODO: don't need both image and imageSrc, upload image to hosting service and use the url
     if (!image || !imageSrc) return;
-    console.log("imageSrc", imageSrc);
-    const response = await detectDeepfake(imageSrc);
-    console.log("response", response);
-    const predictions = response?.predictions;
-    if (predictions?.length && predictions[0].class === "fake") {
-      setDeepfakePredictionResult({
-        isDeepfake: true,
-        confidence: predictions[0].confidence,
-      });
-      setProcessingStatus("COMPLETED");
-      return;
-    } else {
-      if (predictions?.length && predictions[0].class === "real") {
+
+    let deepfakePredictions = null;
+
+    if (searchSettings.shouldCheckDeepfake) {
+      const response = await detectDeepfake(imageSrc);
+      deepfakePredictions = response?.predictions;
+      if (
+        deepfakePredictions &&
+        deepfakePredictions?.length &&
+        deepfakePredictions[0].class === "fake"
+      ) {
         setDeepfakePredictionResult({
-          isDeepfake: false,
-          confidence: predictions[0].confidence,
+          result: "fake",
+          confidence: deepfakePredictions[0].confidence,
+        });
+        setProcessingStatus("COMPLETED");
+        return;
+      } else if (
+        deepfakePredictions &&
+        deepfakePredictions?.length &&
+        deepfakePredictions[0].class === "real"
+      ) {
+        setDeepfakePredictionResult({
+          result: "real",
+          confidence: deepfakePredictions[0].confidence,
+        });
+      } else {
+        setDeepfakePredictionResult({
+          result: "unknown",
+          confidence: 0,
         });
       }
+    }
+
+    if (searchSettings.shouldRecognizeFace) {
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
         image
       );
       setRecognizedFaces(recognizedFaces);
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
-      setProcessingStatus("COMPLETED");
     }
+
+    setProcessingStatus("COMPLETED");
   };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,6 +181,7 @@ const ImageInputArea = () => {
                   setRecognizedFaces(null);
                   setboundingBoxOverlaySrc(null);
                   setProcessingStatus("IDLE");
+                  setDeepfakePredictionResult(null);
                 }}
                 cursor="pointer"
                 boxSize={6}
@@ -169,22 +203,39 @@ const ImageInputArea = () => {
                 boxSize={6}
                 color="blue.500"
                 cursor="pointer"
-                onClick={() => imageSrc && onStartRequest(image, imageSrc)}
+                onClick={() =>
+                  imageSrc &&
+                  onStartRequest(image, imageSrc, {
+                    shouldCheckDeepfake,
+                    shouldRecognizeFace,
+                    shouldSearchRelatedResults,
+                  })
+                }
               />
             )
           )}
         </Box>
         {deepfakePredictionResult && (
           <Box>
-            {deepfakePredictionResult.isDeepfake ? (
-              <Text background="red.600" color="red.100">
+            {deepfakePredictionResult.result === "fake" ? (
+              <Text
+                background="red.600"
+                color="red.100"
+                textAlign={"start"}
+                p={3}
+              >
                 This image is AI-generated with a confidence of{" "}
                 {deepfakePredictionResult.confidence.toPrecision(3)}
               </Text>
-            ) : (
-              <Text>
+            ) : deepfakePredictionResult.result === "real" ? (
+              <Text textAlign={"start"} p={3}>
                 This image is not AI-generated with a confidence of{" "}
                 {deepfakePredictionResult.confidence.toPrecision(3)}
+              </Text>
+            ) : (
+              <Text textAlign={"start"} p={3}>
+                Could not conclusively determine if this image is AI-generated
+                (meaning it is likelier to be real than fake)
               </Text>
             )}
           </Box>

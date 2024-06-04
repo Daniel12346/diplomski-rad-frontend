@@ -22,9 +22,24 @@ export const processingStatusState = atom<"IDLE" | "LOADING" | "COMPLETED">({
   default: "IDLE",
 });
 export const deepfakePredictionResultState = atom<{
-  isDeepfake: boolean;
+  result: "fake" | "real" | "unknown";
   confidence: number;
 } | null>({
   key: "deepfakePredictionResultState",
   default: null,
+});
+
+export const shouldRecognizeFaceState = atom<boolean>({
+  key: "shouldRecognizeFaceState",
+  default: true,
+});
+
+export const shouldCheckDeepfakeState = atom<boolean>({
+  key: "shouldCheckDeepfakeState",
+  default: true,
+});
+
+export const shouldSearchRelatedResultsState = atom<boolean>({
+  key: "shouldSearchRelatedResultsState",
+  default: true,
 });

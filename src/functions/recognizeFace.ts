@@ -1,6 +1,4 @@
 const recognizeFace = async (image: File | null) => {
-  console.log("image", image);
-
   if (image) {
     try {
       const formData = new FormData();

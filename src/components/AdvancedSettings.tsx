@@ -10,8 +10,23 @@ import {
   FormLabel,
   Switch,
 } from "@chakra-ui/react";
+import { useRecoilState } from "recoil";
+import {
+  shouldCheckDeepfakeState,
+  shouldRecognizeFaceState,
+  shouldSearchRelatedResultsState,
+} from "../recoil/state";
 
 const AdvancedSettings = () => {
+  const [shouldRecognizeFace, setShouldRecognizeFace] = useRecoilState(
+    shouldRecognizeFaceState
+  );
+  const [shuoldCheckDeepfake, setShouldCheckDeepfake] = useRecoilState(
+    shouldCheckDeepfakeState
+  );
+  const [shouldSearchRelatedResults, setShouldSearchRelatedResults] =
+    useRecoilState(shouldSearchRelatedResultsState);
+
   return (
     <Container>
       <Accordion allowToggle>
@@ -30,30 +45,47 @@ const AdvancedSettings = () => {
               alignItems="center"
               justifyContent="space-between"
             >
-              <FormLabel htmlFor="isChecked" fontWeight="normal">
+              <FormLabel htmlFor="shouldRecognizeFace" fontWeight="normal">
                 recognize face
               </FormLabel>
-              <Switch id="isChecked" isChecked />
+              <Switch
+                id="shouldRecognizeFace"
+                isChecked={shouldRecognizeFace}
+                onChange={(e) => setShouldRecognizeFace(e.target.checked)}
+              />
             </FormControl>
             <FormControl
               display="flex"
               alignItems="center"
               justifyContent="space-between"
             >
-              <FormLabel htmlFor="isChecked" fontWeight="normal">
+              <FormLabel htmlFor="shouldCheckDeepfake" fontWeight="normal">
                 check deepfake
               </FormLabel>
-              <Switch id="isChecked" isChecked />
+              <Switch
+                id="shouldCheckDeepfake"
+                isChecked={shuoldCheckDeepfake}
+                onChange={(e) => setShouldCheckDeepfake(e.target.checked)}
+              />
             </FormControl>
             <FormControl
               display="flex"
               alignItems="center"
               justifyContent="space-between"
             >
-              <FormLabel htmlFor="isChecked" fontWeight="normal">
+              <FormLabel
+                htmlFor="shouldSearchRelatedResults"
+                fontWeight="normal"
+              >
                 search related results
               </FormLabel>
-              <Switch id="isChecked" isChecked />
+              <Switch
+                id="shouldSearchRelatedResults"
+                isChecked={shouldSearchRelatedResults}
+                onChange={(e) =>
+                  setShouldSearchRelatedResults(e.target.checked)
+                }
+              />
             </FormControl>
           </AccordionPanel>
         </AccordionItem>
