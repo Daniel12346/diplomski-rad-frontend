@@ -1,9 +1,10 @@
-const recognizeFace = async (image: File) => {
+const recognizeFace = async (image: File | null) => {
+  console.log("image", image);
+
   if (image) {
     try {
       const formData = new FormData();
       formData.append("image", image);
-      console.log(import.meta.env.VITE_FACE_RECOGNITION_URL);
       const response = await fetch(
         `${import.meta.env.VITE_FACE_RECOGNITION_URL}`,
         {

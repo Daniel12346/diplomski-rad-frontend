@@ -23,12 +23,8 @@ interface Prediction {
 }
 
 const detectDeepfake = async (
-  dataUrl: String
+  dataUrl: string
 ): Promise<PredictionResponse | undefined> => {
-  console.log(
-    import.meta.env.VITE_DEEPFAKE_DETECTION_API_URL,
-    import.meta.env.VITE_DEEPFAKE_DETECTION_API_KEY
-  );
   if (dataUrl) {
     try {
       const response = await axios({
@@ -43,7 +39,6 @@ const detectDeepfake = async (
         },
       });
       const { data } = response;
-      console.log(data);
       return data;
     } catch (error) {
       throw error;

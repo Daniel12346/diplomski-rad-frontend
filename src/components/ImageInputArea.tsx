@@ -9,51 +9,65 @@ import {
   Stack,
   Flex,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 // import useRecognizeFace from "../hooks/useRecognizeFace";
 import recognizeFace from "../functions/recognizeFace";
 import detectDeepfake from "../functions/detectDeepfake";
+import { useRecoilState } from "recoil";
+import {
+  boundingBoxOverlaySrcState,
+  deepfakePredictionResultState,
+  imageSrcState,
+  imageState,
+  processingStatusState,
+  recognizedFacesState,
+} from "../recoil/state";
 
 const ImageInputArea = () => {
-  const [image, setImage] = useState<File | null>(null);
-  const [deepfakePredictionResult, setDeepfakePredictionResult] = useState<{
-    isDeepfake: boolean;
-    confidence: number;
-  } | null>(null);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [processingState, setProcessingState] = useState<
-    "IDLE" | "LOADING" | "COMPLETED"
-  >("IDLE");
-  const [recognizedFaces, setRecognizedFaces] = useState<string[] | null>(null);
-  const [boundingBoxOverlaySrc, setboundingBoxOverlaySrc] = useState<
-    string | null
-  >(null);
+  const [image, setImage] = useRecoilState(imageState);
+  const [deepfakePredictionResult, setDeepfakePredictionResult] =
+    useRecoilState(deepfakePredictionResultState);
+  const [imageSrc, setImageSrc] = useRecoilState(imageSrcState);
+  const [processingStatus, setProcessingStatus] = useRecoilState(
+    processingStatusState
+  );
+  const [recognizedFaces, setRecognizedFaces] =
+    useRecoilState(recognizedFacesState);
+  const [boundingBoxOverlaySrc, setboundingBoxOverlaySrc] = useRecoilState(
+    boundingBoxOverlaySrcState
+  );
 
-  const onStartRequest = async (image: File | null) => {
-    if (image && imageSrc) {
-      setProcessingState("LOADING");
-      const response = await detectDeepfake(imageSrc);
-      if (response?.predictions.length) {
-        const deepfakePrediction = response.predictions[0];
-        if (deepfakePrediction.class === "fake") {
-          setDeepfakePredictionResult({
-            isDeepfake: true,
-            confidence: deepfakePrediction.confidence,
-          });
-          setProcessingState("COMPLETED");
-        } else {
-          setDeepfakePredictionResult({
-            isDeepfake: false,
-            confidence: deepfakePrediction.confidence,
-          });
-        }
+  const onStartRequest = async (
+    image: File | null,
+    imageSrc: string | null
+  ) => {
+    setProcessingStatus("LOADING");
+
+    if (!image || !imageSrc) return;
+    console.log("imageSrc", imageSrc);
+    const response = await detectDeepfake(imageSrc);
+    console.log("response", response);
+    const predictions = response?.predictions;
+    if (predictions?.length && predictions[0].class === "fake") {
+      setDeepfakePredictionResult({
+        isDeepfake: true,
+        confidence: predictions[0].confidence,
+      });
+      setProcessingStatus("COMPLETED");
+      return;
+    } else {
+      if (predictions?.length && predictions[0].class === "real") {
+        setDeepfakePredictionResult({
+          isDeepfake: false,
+          confidence: predictions[0].confidence,
+        });
       }
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
         image
       );
       setRecognizedFaces(recognizedFaces);
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
-      setProcessingState("COMPLETED");
+      setProcessingStatus("COMPLETED");
     }
   };
 
@@ -125,7 +139,7 @@ const ImageInputArea = () => {
       </Center>
       <Box>
         <Box p={2}>
-          {processingState === "LOADING" && <Spinner />}
+          {processingStatus === "LOADING" && <Spinner />}
           {recognizedFaces?.length ? (
             <Flex gap={5}>
               <DeleteIcon
@@ -133,7 +147,7 @@ const ImageInputArea = () => {
                   setImage(null);
                   setRecognizedFaces(null);
                   setboundingBoxOverlaySrc(null);
-                  setProcessingState("IDLE");
+                  setProcessingStatus("IDLE");
                 }}
                 cursor="pointer"
                 boxSize={6}
@@ -150,12 +164,12 @@ const ImageInputArea = () => {
             </Flex>
           ) : (
             image &&
-            processingState === "IDLE" && (
+            processingStatus === "IDLE" && (
               <SearchIcon
                 boxSize={6}
                 color="blue.500"
                 cursor="pointer"
-                onClick={() => onStartRequest(image)}
+                onClick={() => imageSrc && onStartRequest(image, imageSrc)}
               />
             )
           )}
