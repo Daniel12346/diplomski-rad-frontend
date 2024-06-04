@@ -22,7 +22,7 @@ const ImageInputArea = () => {
   } | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [processingState, setProcessingState] = useState<
-    "IDLE" | "LOADING" | "COMPLETED" | ""
+    "IDLE" | "LOADING" | "COMPLETED"
   >("IDLE");
   const [recognizedFaces, setRecognizedFaces] = useState<string[] | null>(null);
   const [boundingBoxOverlaySrc, setboundingBoxOverlaySrc] = useState<
@@ -123,57 +123,59 @@ const ImageInputArea = () => {
           </FormLabel>
         )}
       </Center>
-      <Box p={2}>
-        {processingState === "LOADING" && <Spinner />}
-        {recognizedFaces?.length ? (
-          <Flex gap={5}>
-            <DeleteIcon
-              onClick={() => {
-                setImage(null);
-                setRecognizedFaces(null);
-                setboundingBoxOverlaySrc(null);
-                setProcessingState("IDLE");
-              }}
-              cursor="pointer"
-              boxSize={6}
-              color="red.500"
-            ></DeleteIcon>
-            <Flex>
-              <Text>Recognized faces:</Text>
-              <Box>
-                {recognizedFaces.map((name) => (
-                  <Text key={name}>{name}</Text>
-                ))}
-              </Box>
+      <Box>
+        <Box p={2}>
+          {processingState === "LOADING" && <Spinner />}
+          {recognizedFaces?.length ? (
+            <Flex gap={5}>
+              <DeleteIcon
+                onClick={() => {
+                  setImage(null);
+                  setRecognizedFaces(null);
+                  setboundingBoxOverlaySrc(null);
+                  setProcessingState("IDLE");
+                }}
+                cursor="pointer"
+                boxSize={6}
+                color="red.500"
+              ></DeleteIcon>
+              <Flex>
+                <Text>Recognized faces:</Text>
+                <Box>
+                  {recognizedFaces.map((name) => (
+                    <Text key={name}>{name}</Text>
+                  ))}
+                </Box>
+              </Flex>
             </Flex>
-          </Flex>
-        ) : (
-          image &&
-          processingState === "IDLE" && (
-            <SearchIcon
-              boxSize={6}
-              color="blue.500"
-              cursor="pointer"
-              onClick={() => onStartRequest(image)}
-            />
-          )
-        )}
-      </Box>
-      {deepfakePredictionResult && (
-        <Box>
-          {deepfakePredictionResult.isDeepfake ? (
-            <Text background="red.400" color="red.50">
-              This image is AI-generated with a confidence of{" "}
-              {deepfakePredictionResult.confidence.toPrecision(3)}
-            </Text>
           ) : (
-            <Text>
-              This image is not AI-generated with a confidence of{" "}
-              {deepfakePredictionResult.confidence.toPrecision(3)}
-            </Text>
+            image &&
+            processingState === "IDLE" && (
+              <SearchIcon
+                boxSize={6}
+                color="blue.500"
+                cursor="pointer"
+                onClick={() => onStartRequest(image)}
+              />
+            )
           )}
         </Box>
-      )}
+        {deepfakePredictionResult && (
+          <Box>
+            {deepfakePredictionResult.isDeepfake ? (
+              <Text background="red.600" color="red.100">
+                This image is AI-generated with a confidence of{" "}
+                {deepfakePredictionResult.confidence.toPrecision(3)}
+              </Text>
+            ) : (
+              <Text>
+                This image is not AI-generated with a confidence of{" "}
+                {deepfakePredictionResult.confidence.toPrecision(3)}
+              </Text>
+            )}
+          </Box>
+        )}
+      </Box>
     </Stack>
   );
 };

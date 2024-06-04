@@ -1,6 +1,7 @@
 import "./App.css";
-import { Center, Container, Text } from "@chakra-ui/react";
+import { Center, Container, Stack, Text } from "@chakra-ui/react";
 import ImageInputArea from "./components/ImageInputArea";
+import AdvancedSettings from "./components/AdvancedSettings";
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
           aliquip ex ea commodo consequat.
         </Text>
       </Container>
-      <Center>
+      <Stack>
+        <AdvancedSettings />
         <Center
           background="blue.50"
           rounded="md"
@@ -24,7 +26,7 @@ function App() {
         >
           <ImageInputArea />
         </Center>
-      </Center>
+      </Stack>
     </Container>
   );
 }
