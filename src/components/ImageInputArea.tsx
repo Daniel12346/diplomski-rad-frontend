@@ -61,8 +61,8 @@ const ImageInputArea = () => {
     //TODO: don't need both image and imageSrc, upload image to hosting service and use the url
     if (!image || !imageSrc) return;
 
-    const imageURL = await uploadImageToHostingService(image);
-    console.log(imageURL);
+    const hostedUrl = await uploadImageToHostingService(image);
+    console.log("Hosted: ", hostedUrl);
 
     let deepfakePredictions = null;
 
