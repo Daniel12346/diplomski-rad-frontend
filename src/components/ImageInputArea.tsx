@@ -25,6 +25,7 @@ import {
   shouldRecognizeFaceState,
   shouldSearchRelatedResultsState,
 } from "../recoil/state";
+import uploadImageToHostingService from "../functions/uploadImageToHostingService";
 
 const ImageInputArea = () => {
   const [image, setImage] = useRecoilState(imageState);
@@ -59,6 +60,9 @@ const ImageInputArea = () => {
     setProcessingStatus("LOADING");
     //TODO: don't need both image and imageSrc, upload image to hosting service and use the url
     if (!image || !imageSrc) return;
+
+    const imageURL = await uploadImageToHostingService(image);
+    console.log(imageURL);
 
     let deepfakePredictions = null;
 
