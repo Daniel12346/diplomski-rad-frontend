@@ -1,18 +1,21 @@
-const recognizeFace = async (image: File | null) => {
-  if (image) {
+import axios from "axios";
+
+const recognizeFace = async (imageSrc: string | null) => {
+  if (imageSrc) {
     try {
-      const formData = new FormData();
-      formData.append("image", image);
-      const response = await fetch(
-        `${import.meta.env.VITE_FACE_RECOGNITION_URL}`,
+      // const formData = new FormData();
+      // formData.append("imageSrc", imageSrc);
+      const response = await axios.post(
+        import.meta.env.VITE_FACE_RECOGNITION_API_URL,
+        { imageSrc },
         {
-          method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
-      const data = await response.json();
       //boundingBoxOverlaySrc is the url of an image with just the face bounding boxes drawn on it
-      const { matchResults, boundingBoxOverlaySrc } = data;
+      const { matchResults, boundingBoxOverlaySrc } = response.data;
       const recognizedFaces = matchResults?.length
         ? matchResults.map((e: any) => e._label)
         : null;

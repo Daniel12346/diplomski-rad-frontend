@@ -62,12 +62,11 @@ const ImageInputArea = () => {
     if (!image || !imageSrc) return;
 
     const hostedUrl = await uploadImageToHostingService(image);
-    console.log("Hosted: ", hostedUrl);
 
     let deepfakePredictions = null;
 
     if (searchSettings.shouldCheckDeepfake) {
-      const response = await detectDeepfake(imageSrc);
+      const response = await detectDeepfake(hostedUrl);
       deepfakePredictions = response?.predictions;
       if (
         deepfakePredictions &&
@@ -99,7 +98,7 @@ const ImageInputArea = () => {
 
     if (searchSettings.shouldRecognizeFace) {
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
-        image
+        hostedUrl
       );
       setRecognizedFaces(recognizedFaces);
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);

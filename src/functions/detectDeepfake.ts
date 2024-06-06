@@ -23,19 +23,16 @@ interface Prediction {
 }
 
 const detectDeepfake = async (
-  dataUrl: string
+  imageUrl: string
 ): Promise<PredictionResponse | undefined> => {
-  if (dataUrl) {
+  if (imageUrl) {
     try {
       const response = await axios({
         method: "POST",
         url: import.meta.env.VITE_DEEPFAKE_DETECTION_API_URL,
         params: {
           api_key: import.meta.env.VITE_DEEPFAKE_DETECTION_API_KEY,
-        },
-        data: dataUrl,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          image: imageUrl,
         },
       });
       const { data } = response;
