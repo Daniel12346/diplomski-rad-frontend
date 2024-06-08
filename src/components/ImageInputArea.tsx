@@ -26,6 +26,7 @@ import {
   shouldSearchRelatedResultsState,
 } from "../recoil/state";
 import uploadImageToHostingService from "../functions/uploadImageToHostingService";
+import searchRelatedResults from "../functions/searchRelatedResults";
 
 const ImageInputArea = () => {
   const [image, setImage] = useRecoilState(imageState);
@@ -46,16 +47,12 @@ const ImageInputArea = () => {
     shouldSearchRelatedResultsState
   );
 
-  interface SearchSettings {
-    shouldRecognizeFace: boolean;
-    shouldCheckDeepfake: boolean;
-    shouldSearchRelatedResults: boolean;
-  }
-
   const onStartRequest = async (
     image: File | null,
     imageSrc: string | null,
-    searchSettings: SearchSettings
+    shouldRecognizeFace: boolean,
+    shouldCheckDeepfake: boolean,
+    shouldSearchRelatedResults: boolean
   ) => {
     setProcessingStatus("LOADING");
     //TODO: don't need both image and imageSrc, upload image to hosting service and use the url
@@ -65,7 +62,7 @@ const ImageInputArea = () => {
 
     let deepfakePredictions = null;
 
-    if (searchSettings.shouldCheckDeepfake) {
+    if (shouldCheckDeepfake) {
       const response = await detectDeepfake(hostedUrl);
       deepfakePredictions = response?.predictions;
       if (
@@ -96,12 +93,16 @@ const ImageInputArea = () => {
       }
     }
 
-    if (searchSettings.shouldRecognizeFace) {
+    if (shouldRecognizeFace) {
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
         hostedUrl
       );
       setRecognizedFaces(recognizedFaces);
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
+    }
+    if (shouldSearchRelatedResults) {
+      const relatedResults = await searchRelatedResults(hostedUrl);
+      console.log(relatedResults);
     }
 
     setProcessingStatus("COMPLETED");
@@ -173,6 +174,13 @@ const ImageInputArea = () => {
           </FormLabel>
         )}
       </Center>
+      <Input
+        type="url"
+        color="blue.500"
+        border={"1px solid"}
+        placeholder="or paste an image url"
+        onBlur={(e) => setImageSrc(e.target.value)}
+      />
       <Box>
         <Box p={2}>
           {processingStatus === "LOADING" && <Spinner />}
@@ -181,6 +189,7 @@ const ImageInputArea = () => {
               <DeleteIcon
                 onClick={() => {
                   setImage(null);
+                  setImageSrc(null);
                   setRecognizedFaces(null);
                   setboundingBoxOverlaySrc(null);
                   setProcessingStatus("IDLE");
@@ -200,7 +209,7 @@ const ImageInputArea = () => {
               </Flex>
             </Flex>
           ) : (
-            image &&
+            (image || imageSrc) &&
             processingStatus === "IDLE" && (
               <SearchIcon
                 boxSize={6}
@@ -208,11 +217,13 @@ const ImageInputArea = () => {
                 cursor="pointer"
                 onClick={() =>
                   imageSrc &&
-                  onStartRequest(image, imageSrc, {
+                  onStartRequest(
+                    image,
+                    imageSrc,
                     shouldCheckDeepfake,
                     shouldRecognizeFace,
-                    shouldSearchRelatedResults,
-                  })
+                    shouldSearchRelatedResults
+                  )
                 }
               />
             )

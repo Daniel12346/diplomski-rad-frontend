@@ -3,8 +3,6 @@ import axios from "axios";
 const recognizeFace = async (imageSrc: string | null) => {
   if (imageSrc) {
     try {
-      // const formData = new FormData();
-      // formData.append("imageSrc", imageSrc);
       const response = await axios.post(
         import.meta.env.VITE_FACE_RECOGNITION_API_URL,
         { imageSrc },

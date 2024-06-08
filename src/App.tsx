@@ -1,11 +1,17 @@
 import "./App.css";
-import { Center, Container, Stack, Text } from "@chakra-ui/react";
+import { Center, Container, Stack, Text, useColorMode } from "@chakra-ui/react";
 import ImageInputArea from "./components/ImageInputArea";
 import AdvancedSettings from "./components/AdvancedSettings";
 
 function App() {
+  // const { colorMode, toggleColorMode } = useColorMode();
   return (
-    <Container>
+    <Container
+    //   onClick={() => {
+    //     toggleColorMode();
+    //     alert(colorMode);
+    //   }}
+    >
       <Container background="blue.100" rounded="md" mb={8}>
         <Text align="start" color="blue.500">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -17,7 +23,6 @@ function App() {
       <Stack>
         <AdvancedSettings />
         <Center
-          background="blue.50"
           rounded="md"
           // boxSize="xs"
           borderWidth={2}
