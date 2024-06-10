@@ -8,6 +8,7 @@ import {
   Spinner,
   Stack,
   Flex,
+  Link,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 // import useRecognizeFace from "../hooks/useRecognizeFace";
@@ -21,6 +22,7 @@ import {
   imageState,
   processingStatusState,
   recognizedFacesState,
+  searchResultsState,
   shouldCheckDeepfakeState,
   shouldRecognizeFaceState,
   shouldSearchRelatedResultsState,
@@ -32,6 +34,8 @@ const ImageInputArea = () => {
   const [image, setImage] = useRecoilState(imageState);
   const [deepfakePredictionResult, setDeepfakePredictionResult] =
     useRecoilState(deepfakePredictionResultState);
+  const [relatedResults, setRelatedResults] =
+    useRecoilState(searchResultsState);
   const [imageSrc, setImageSrc] = useRecoilState(imageSrcState);
   const [processingStatus, setProcessingStatus] = useRecoilState(
     processingStatusState
@@ -101,8 +105,15 @@ const ImageInputArea = () => {
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
     }
     if (shouldSearchRelatedResults) {
-      const relatedResults = await searchRelatedResults(hostedUrl);
-      console.log(relatedResults);
+      const res = await searchRelatedResults(hostedUrl);
+      res?.image_results &&
+        setRelatedResults(
+          res.image_results.map((result: any) => ({
+            title: result.title,
+            favicon: result.favicon,
+            redirect_link: result.redirect_link,
+          }))
+        );
     }
 
     setProcessingStatus("COMPLETED");
@@ -191,6 +202,7 @@ const ImageInputArea = () => {
                   setImage(null);
                   setImageSrc(null);
                   setRecognizedFaces(null);
+                  setRelatedResults(null);
                   setboundingBoxOverlaySrc(null);
                   setProcessingStatus("IDLE");
                   setDeepfakePredictionResult(null);
@@ -254,6 +266,31 @@ const ImageInputArea = () => {
             )}
           </Box>
         )}
+        {relatedResults &&
+          (relatedResults.length > 0 ? (
+            <Box>
+              <Text>Related results:</Text>
+              {relatedResults.map((result) => (
+                <Stack key={result.redirect_link}>
+                  <Link
+                    py={2}
+                    display={"flex"}
+                    alignItems={"center"}
+                    href={result.redirect_link}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {result.favicon && (
+                      <img src={result.favicon} alt="favicon" />
+                    )}
+                    <Text ml={2}>{result.title}</Text>
+                  </Link>
+                </Stack>
+              ))}
+            </Box>
+          ) : (
+            <Text>No related results found</Text>
+          ))}
       </Box>
     </Stack>
   );

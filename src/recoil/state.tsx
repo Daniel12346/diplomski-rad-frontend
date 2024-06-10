@@ -29,6 +29,16 @@ export const deepfakePredictionResultState = atom<{
   default: null,
 });
 
+interface SearchResult {
+  title: string;
+  favicon: string;
+  redirect_link: string;
+}
+export const searchResultsState = atom<SearchResult[] | null>({
+  key: "searchResultsState",
+  default: null,
+});
+
 export const shouldRecognizeFaceState = atom<boolean>({
   key: "shouldRecognizeFaceState",
   default: true,
