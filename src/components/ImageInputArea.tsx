@@ -8,7 +8,6 @@ import {
   Spinner,
   Stack,
   Flex,
-  Link,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 // import useRecognizeFace from "../hooks/useRecognizeFace";
@@ -29,6 +28,7 @@ import {
 } from "../recoil/state";
 import uploadImageToHostingService from "../functions/uploadImageToHostingService";
 import searchRelatedResults from "../functions/searchRelatedResults";
+import RelatedResults from "./RelatedResults";
 
 const ImageInputArea = () => {
   const [image, setImage] = useRecoilState(imageState);
@@ -51,13 +51,20 @@ const ImageInputArea = () => {
     shouldSearchRelatedResultsState
   );
 
-  const onStartRequest = async (
-    image: File | null,
-    imageSrc: string | null,
-    shouldRecognizeFace: boolean,
-    shouldCheckDeepfake: boolean,
-    shouldSearchRelatedResults: boolean
-  ) => {
+  interface RequestParams {
+    image: File | null;
+    imageSrc: string | null;
+    shouldRecognizeFace: boolean;
+    shouldCheckDeepfake: boolean;
+    shouldSearchRelatedResults: boolean;
+  }
+  const onStartRequest = async ({
+    image,
+    imageSrc,
+    shouldRecognizeFace,
+    shouldCheckDeepfake,
+    shouldSearchRelatedResults,
+  }: RequestParams) => {
     setProcessingStatus("LOADING");
     //TODO: don't need both image and imageSrc, upload image to hosting service and use the url
     if (!image || !imageSrc) return;
@@ -143,55 +150,65 @@ const ImageInputArea = () => {
 
   return (
     <Stack>
-      <Center>
-        <Input
-          type="file"
-          accept="image/*"
-          onInput={onImageChange}
-          display="none"
-          id="image"
-          name="image"
-          position={"absolute"}
-        />
+      <Stack
+        gap={0}
+        rounded="md"
+        borderWidth={2}
+        borderColor={"blue.400"}
+        borderStyle={"dashed"}
+      >
+        <Center>
+          <Input
+            type="file"
+            accept="image/*"
+            onInput={onImageChange}
+            display="none"
+            id="image"
+            name="image"
+            position={"absolute"}
+          />
 
-        {imageSrc ? (
-          <Box position={"relative"}>
-            <img src={imageSrc} alt="preview" />
-            <img
-              hidden={!boundingBoxOverlaySrc}
-              src={boundingBoxOverlaySrc || ""}
-              id="overlay"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                zIndex: 1,
-              }}
-            />
-          </Box>
-        ) : (
-          <FormLabel
-            htmlFor="image"
-            cursor="pointer"
-            boxSize="2xs"
-            placeContent="center"
-          >
-            <Center>
-              <PlusSquareIcon boxSize={12} color="blue.500" />
-              <Text>add an image</Text>
-            </Center>
-          </FormLabel>
-        )}
-      </Center>
-      <Input
-        type="url"
-        color="blue.500"
-        border={"1px solid"}
-        placeholder="or paste an image url"
-        onBlur={(e) => setImageSrc(e.target.value)}
-      />
+          {imageSrc ? (
+            <Box position={"relative"}>
+              <img src={imageSrc} alt="preview" />
+              <img
+                hidden={!boundingBoxOverlaySrc}
+                src={boundingBoxOverlaySrc || ""}
+                id="overlay"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  zIndex: 1,
+                }}
+              />
+            </Box>
+          ) : (
+            <FormLabel
+              htmlFor="image"
+              cursor="pointer"
+              boxSize="2xs"
+              placeContent="center"
+            >
+              <Center>
+                <PlusSquareIcon boxSize={12} color="blue.500" />
+                <Text>add an image</Text>
+              </Center>
+            </FormLabel>
+          )}
+        </Center>
+        <Input
+          type="url"
+          color="blue.400"
+          border={"1px solid"}
+          placeholder="or paste an image url"
+          onBlur={(e) => setImageSrc(e.target.value)}
+        />
+      </Stack>
+
+      {/* TODO: move to new component */}
       <Box>
         <Box p={2}>
           {processingStatus === "LOADING" && <Spinner />}
@@ -229,13 +246,13 @@ const ImageInputArea = () => {
                 cursor="pointer"
                 onClick={() =>
                   imageSrc &&
-                  onStartRequest(
+                  onStartRequest({
                     image,
                     imageSrc,
-                    shouldCheckDeepfake,
                     shouldRecognizeFace,
-                    shouldSearchRelatedResults
-                  )
+                    shouldCheckDeepfake,
+                    shouldSearchRelatedResults,
+                  })
                 }
               />
             )
@@ -254,43 +271,19 @@ const ImageInputArea = () => {
                 {deepfakePredictionResult.confidence.toPrecision(3)}
               </Text>
             ) : deepfakePredictionResult.result === "real" ? (
-              <Text textAlign={"start"} p={3}>
+              <Text textAlign={"start"} p={3} background={"green.100"}>
                 This image is not AI-generated with a confidence of{" "}
                 {deepfakePredictionResult.confidence.toPrecision(3)}
               </Text>
             ) : (
-              <Text textAlign={"start"} p={3}>
+              <Text textAlign={"start"} p={3} background={"orange.100"}>
                 Could not conclusively determine if this image is AI-generated
                 (meaning it is likelier to be real than fake)
               </Text>
             )}
           </Box>
         )}
-        {relatedResults &&
-          (relatedResults.length > 0 ? (
-            <Box>
-              <Text>Related results:</Text>
-              {relatedResults.map((result) => (
-                <Stack key={result.redirect_link}>
-                  <Link
-                    py={2}
-                    display={"flex"}
-                    alignItems={"center"}
-                    href={result.redirect_link}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {result.favicon && (
-                      <img src={result.favicon} alt="favicon" />
-                    )}
-                    <Text ml={2}>{result.title}</Text>
-                  </Link>
-                </Stack>
-              ))}
-            </Box>
-          ) : (
-            <Text>No related results found</Text>
-          ))}
+        {relatedResults && <RelatedResults results={relatedResults} />}
       </Box>
     </Stack>
   );

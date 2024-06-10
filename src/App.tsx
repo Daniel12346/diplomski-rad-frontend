@@ -22,13 +22,7 @@ function App() {
       </Container>
       <Stack>
         <AdvancedSettings />
-        <Center
-          rounded="md"
-          // boxSize="xs"
-          borderWidth={2}
-          borderColor={"blue.500"}
-          borderStyle={"dashed"}
-        >
+        <Center>
           <ImageInputArea />
         </Center>
       </Stack>

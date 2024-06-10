@@ -28,7 +28,16 @@ const AdvancedSettings = () => {
     useRecoilState(shouldSearchRelatedResultsState);
 
   return (
-    <Container>
+    <Container
+      onClick={() => {
+        console.log(
+          "shouldRecognizeFace, shuoldCheckDeepfake, shouldSearchRelatedResults:",
+          shouldRecognizeFace,
+          shuoldCheckDeepfake,
+          shouldSearchRelatedResults
+        );
+      }}
+    >
       <Accordion allowToggle>
         <AccordionItem>
           <h2>
