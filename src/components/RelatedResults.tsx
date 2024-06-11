@@ -1,7 +1,7 @@
 import { Stack, Link, Box, Text } from "@chakra-ui/react";
 
 //TODO:type
-const RelatedResults = (results: any) => {
+const RelatedResults = ({ results }: any) => {
   return results?.length > 0 ? (
     <Box p={2}>
       <Text>Related results:</Text>
@@ -22,7 +22,9 @@ const RelatedResults = (results: any) => {
       ))}
     </Box>
   ) : (
-    <Text>No related results found</Text>
+    <Text onClick={() => console.log(results.results)}>
+      No related results found
+    </Text>
   );
 };
 

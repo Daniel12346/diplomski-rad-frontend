@@ -38,7 +38,7 @@ const AdvancedSettings = () => {
         );
       }}
     >
-      <Accordion allowToggle>
+      <Accordion allowToggle mb={2}>
         <AccordionItem>
           <h2>
             <AccordionButton>
