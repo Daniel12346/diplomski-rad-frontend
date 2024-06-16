@@ -125,6 +125,7 @@ const Controls = () => {
       w={"100%"}
     >
       <DeleteIcon
+        _hover={{ filter: "brightness(0.8)" }}
         onClick={() => {
           setImage(null);
           setImageSrc(null);
@@ -140,24 +141,25 @@ const Controls = () => {
       ></DeleteIcon>
       <Center>
         {processingStatus === "LOADING" ? (
-          <Spinner />
+          <Spinner color="blue.600" size={"lg"} />
         ) : (
-          <Circle bg="blue.600" size="40px">
-            <SearchIcon
-              boxSize={6}
-              color="blue.100"
-              cursor="pointer"
-              onClick={() =>
-                imageSrc &&
-                onStartRequest({
-                  image,
-                  imageSrc,
-                  shouldRecognizeFace,
-                  shouldCheckDeepfake,
-                  shouldSearchRelatedResults,
-                })
-              }
-            />
+          <Circle
+            bg="blue.600"
+            size="48px"
+            cursor={"pointer"}
+            _hover={{ filter: "brightness(0.8)" }}
+            onClick={() =>
+              imageSrc &&
+              onStartRequest({
+                image,
+                imageSrc,
+                shouldRecognizeFace,
+                shouldCheckDeepfake,
+                shouldSearchRelatedResults,
+              })
+            }
+          >
+            <SearchIcon boxSize={8} color="blue.100" />
           </Circle>
         )}
       </Center>

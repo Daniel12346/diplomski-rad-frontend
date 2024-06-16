@@ -1,14 +1,14 @@
 import { Stack, Link, Box, Text } from "@chakra-ui/react";
 
 //TODO:type
-const RelatedResults = ({ results }: any) => {
+const RelatedSearchResults = ({ results }: any) => {
   return results?.length > 0 ? (
-    <Box p={2}>
+    <Box>
       <Text>Related results:</Text>
       {results.map((result: any) => (
         <Stack key={result.redirect_link}>
           <Link
-            py={2}
+            py={1}
             display={"flex"}
             alignItems={"center"}
             href={result.redirect_link}
@@ -28,4 +28,4 @@ const RelatedResults = ({ results }: any) => {
   );
 };
 
-export default RelatedResults;
+export default RelatedSearchResults;

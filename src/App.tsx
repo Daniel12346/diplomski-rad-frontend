@@ -1,45 +1,39 @@
 import {
   Center,
-  Container,
   Stack,
   Switch,
-  Text,
   Box,
   useColorMode,
   Spacer,
   Flex,
+  Container,
 } from "@chakra-ui/react";
 import ImageInputArea from "./components/ImageInputArea";
 import AdvancedSettings from "./components/AdvancedSettings";
+import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+import ResultDisplay from "./components/ResultDisplay";
+import { Outlet } from "react-router-dom";
 
-function App() {
-  const { toggleColorMode } = useColorMode();
+function MainScreen() {
+  const { toggleColorMode, colorMode } = useColorMode();
   return (
     <Box>
-      <Flex p={4}>
+      <Flex px={4} py={2}>
         <Spacer />
+        <Center pr={2}>
+          {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+        </Center>
         <Switch
           onChange={() => {
             toggleColorMode();
           }}
         ></Switch>
       </Flex>
-      <Container background="blue.100" rounded="md" mb={8} mt={4}>
-        <Text align="start" color="blue.500">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat.
-        </Text>
-      </Container>
-      <Stack>
-        <AdvancedSettings />
-        <Center>
-          <ImageInputArea />
-        </Center>
-      </Stack>
+      <Center>
+        <Outlet />
+      </Center>
     </Box>
   );
 }
 
-export default App;
+export default MainScreen;
