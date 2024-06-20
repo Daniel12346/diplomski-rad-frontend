@@ -16,7 +16,7 @@ const saveCheckResultData = async ({
   if (imageUrl && socialMediaName && recognizedFace && result) {
     try {
       const response = await axios.post(
-        import.meta.env.VITE_SAVE_CHECK_RESULTS_API_URL + "/save-result-data",
+        import.meta.env.VITE_CHECK_RESULTS_API_URL + "/save-result-data",
         { imageUrl, socialMediaName, recognizedFace, result },
         {
           headers: {

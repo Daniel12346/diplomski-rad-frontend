@@ -22,7 +22,7 @@ export const processingStatusState = atom<"IDLE" | "LOADING" | "COMPLETED">({
   default: "IDLE",
 });
 export const deepfakePredictionResultState = atom<{
-  result: "fake" | "real" | "unknown";
+  result: "FAKE" | "REAL" | "UNKNOWN";
   confidence: number;
 } | null>({
   key: "deepfakePredictionResultState",

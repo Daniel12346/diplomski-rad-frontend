@@ -17,6 +17,7 @@ import detectDeepfake from "../functions/detectDeepfake";
 import recognizeFace from "../functions/recognizeFace";
 import searchRelatedResults from "../functions/searchRelatedResults";
 import uploadImageToHostingService from "../functions/uploadImageToHostingService";
+import saveCheckResultData from "../functions/saveCheckResultData";
 
 const Controls = () => {
   const image = useRecoilValue(imageState);
@@ -62,41 +63,69 @@ const Controls = () => {
 
     let deepfakePredictions = null;
 
+    //TODO: either use recognizedFaces or recognizedFace both in client and server
+    let recognizedFace = "UNKNOWN";
+    //whether the image is AI generated
+    //TODO: find a better name for this variable
+    let result: "FAKE" | "REAL" | "UNKNOWN" = "UNKNOWN";
+    //TODO:
+    let socialMediaName = "UNKNOWN";
+
     if (shouldCheckDeepfake) {
       const response = await detectDeepfake(hostedUrl);
       deepfakePredictions = response?.predictions;
-      if (
-        deepfakePredictions &&
-        deepfakePredictions?.length &&
-        deepfakePredictions[0].class === "fake"
-      ) {
+      if (deepfakePredictions && deepfakePredictions?.length) {
+        result = deepfakePredictions[0].class.toLocaleUpperCase() as
+          | "FAKE"
+          | "REAL";
         setDeepfakePredictionResult({
-          result: "fake",
+          result: result,
           confidence: deepfakePredictions[0].confidence,
         });
-        setProcessingStatus("COMPLETED");
-        return;
-      } else if (
-        deepfakePredictions &&
-        deepfakePredictions?.length &&
-        deepfakePredictions[0].class === "real"
-      ) {
+        // if (result === "FAKE") {
+        //   setProcessingStatus("COMPLETED");
+        //   return;
+        // }
+      } else if (result === "UNKNOWN") {
         setDeepfakePredictionResult({
-          result: "real",
-          confidence: deepfakePredictions[0].confidence,
-        });
-      } else {
-        setDeepfakePredictionResult({
-          result: "unknown",
+          result: "UNKNOWN",
           confidence: 0,
         });
       }
+
+      // if (
+      //   deepfakePredictions &&
+      //   deepfakePredictions?.length &&
+      //   deepfakePredictions[0].class === "fake"
+      // ) {
+      //   setDeepfakePredictionResult({
+      //     result: "fake",
+      //     confidence: deepfakePredictions[0].confidence,
+      //   });
+      //   setProcessingStatus("COMPLETED");
+      //   return;
+      // } else if (
+      //   deepfakePredictions &&
+      //   deepfakePredictions?.length &&
+      //   deepfakePredictions[0].class === "real"
+      // ) {
+      //   setDeepfakePredictionResult({
+      //     result: "real",
+      //     confidence: deepfakePredictions[0].confidence,
+      //   });
+      // } else {
+      //   setDeepfakePredictionResult({
+      //     result: "unknown",
+      //     confidence: 0,
+      //   });
+      // }
     }
 
-    if (shouldRecognizeFace) {
+    if (shouldRecognizeFace && result !== "FAKE") {
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
         hostedUrl
       );
+      recognizedFace = recognizedFaces ? recognizedFaces[0] : "UNKNOWN";
       setRecognizedFaces(recognizedFaces);
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
     }
@@ -112,6 +141,13 @@ const Controls = () => {
           }))
         );
     }
+    await saveCheckResultData({
+      imageUrl: hostedUrl,
+      //TODO:
+      socialMediaName: "X",
+      recognizedFace,
+      result,
+    });
 
     setProcessingStatus("COMPLETED");
   };
