@@ -1,4 +1,4 @@
-import { Stack, Center, Container } from "@chakra-ui/react";
+import { Stack, Center } from "@chakra-ui/react";
 import AdvancedSettings from "../components/AdvancedSettings";
 import ImageInputArea from "../components/ImageInputArea";
 import ResultDisplay from "../components/ResultDisplay";

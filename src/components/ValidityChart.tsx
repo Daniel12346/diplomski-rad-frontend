@@ -3,7 +3,6 @@ import { Pie } from "react-chartjs-2";
 import { useRecoilState } from "recoil";
 import { validityStatsState } from "../recoil/state";
 import { useEffect } from "react";
-import getSocialMediaStats from "../functions/getSocialMediaStats";
 import getValidityStats from "../functions/getValidityStats";
 
 ChartJS.register(ArcElement, Tooltip, Legend);

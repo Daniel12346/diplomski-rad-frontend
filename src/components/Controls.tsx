@@ -69,7 +69,7 @@ const Controls = () => {
     //TODO: find a better name for this variable
     let result: "FAKE" | "REAL" | "UNKNOWN" = "UNKNOWN";
     //TODO:
-    let socialMediaName = "UNKNOWN";
+    // let socialMediaName = "UNKNOWN";
 
     if (shouldCheckDeepfake) {
       const response = await detectDeepfake(hostedUrl);
