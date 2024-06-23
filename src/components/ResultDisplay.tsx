@@ -31,7 +31,7 @@ const ResultDisplay = () => {
         </Box>
         {deepfakePredictionResult && (
           <Box>
-            {deepfakePredictionResult.result === "fake" ? (
+            {deepfakePredictionResult.result === "FAKE" ? (
               <Text
                 background="red.100"
                 color="red.600"
@@ -43,7 +43,7 @@ const ResultDisplay = () => {
                 This image is AI-generated with a confidence of{" "}
                 {deepfakePredictionResult.confidence.toPrecision(3)}
               </Text>
-            ) : deepfakePredictionResult.result === "real" ? (
+            ) : deepfakePredictionResult.result === "REAL" ? (
               <Text
                 textAlign={"start"}
                 p={3}

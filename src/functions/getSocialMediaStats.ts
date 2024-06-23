@@ -10,7 +10,8 @@ const getSocialMediaStats = async () => {
         },
       }
     );
-    const { socialMediaStats } = response.data;
+    console.log(response);
+    const socialMediaStats = response.data;
     return { socialMediaStats };
   } catch (error) {
     console.log(error);

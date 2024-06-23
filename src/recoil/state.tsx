@@ -53,3 +53,24 @@ export const shouldSearchRelatedResultsState = atom<boolean>({
   key: "shouldSearchRelatedResultsState",
   default: true,
 });
+
+type ValidityStats = {
+  totalImages: number;
+  fakeImages: number;
+  realImages: number;
+  unknownImages: number;
+};
+export const validityStatsState = atom<ValidityStats | null>({
+  key: "validityStatsState",
+  default: null,
+});
+
+type SocialMediaStat = {
+  _id: string;
+  count: number;
+};
+
+export const socialMediaStatsState = atom<SocialMediaStat[] | null>({
+  key: "socialMediaStatsState",
+  default: null,
+});
