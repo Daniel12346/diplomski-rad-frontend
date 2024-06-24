@@ -33,6 +33,7 @@ const detectDeepfake = async (
         params: {
           api_key: import.meta.env.VITE_DEEPFAKE_DETECTION_API_KEY,
           image: imageUrl,
+          confidence: 0.2,
         },
       });
       const { data } = response;

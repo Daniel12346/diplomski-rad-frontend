@@ -1,4 +1,4 @@
-import { PlusSquareIcon } from "@chakra-ui/icons";
+import { ArrowForwardIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import {
   Center,
   Input,
@@ -7,8 +7,10 @@ import {
   Box,
   Stack,
   Image,
+  InputGroup,
+  InputRightElement,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   boundingBoxOverlaySrcState,
@@ -19,12 +21,11 @@ import Controls from "./Controls";
 
 const ImageInputArea = () => {
   const [image, setImage] = useRecoilState(imageState);
-
   const [imageSrc, setImageSrc] = useRecoilState(imageSrcState);
-
   const boundingBoxOverlaySrc = useRecoilValue(boundingBoxOverlaySrcState);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedImage = e.target.files?.[0];
     if (uploadedImage) {
       setImage(uploadedImage);
@@ -56,7 +57,7 @@ const ImageInputArea = () => {
         <Input
           type="file"
           accept="image/*"
-          onInput={onImageChange}
+          onInput={onImageInput}
           display="none"
           id="image"
           name="image"
@@ -100,15 +101,32 @@ const ImageInputArea = () => {
         )}
       </Center>
       {!imageSrc && (
-        <Input
-          _placeholder={{ color: "blue.400" }}
-          type="url"
-          mt={1}
-          border={"2px solid"}
-          borderColor={"gray.400"}
-          placeholder="or paste an image url"
-          onBlur={(e) => setImageSrc(e.target.value)}
-        />
+        <InputGroup>
+          <Input
+            size="sm"
+            alignSelf={"center"}
+            _placeholder={{ color: "blue.400" }}
+            type="url"
+            mt={1}
+            border={"2px solid"}
+            borderColor={"gray.400"}
+            placeholder="or paste an image url"
+            ref={fileInputRef}
+          />
+          <InputRightElement
+            display={"flex"}
+            justifyContent={"flex-end"}
+            cursor={"pointer"}
+            onClick={() => {
+              const url = fileInputRef.current?.value;
+              if (url) {
+                setImageSrc(url);
+              }
+            }}
+          >
+            <ArrowForwardIcon boxSize={8} color="blue.100" bg="blue.500" />
+          </InputRightElement>
+        </InputGroup>
       )}
     </Stack>
   );

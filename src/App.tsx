@@ -1,17 +1,14 @@
 import {
   Center,
-  Stack,
   Switch,
   Box,
   useColorMode,
   Spacer,
   Flex,
-  Container,
 } from "@chakra-ui/react";
-import ImageInputArea from "./components/ImageInputArea";
-import AdvancedSettings from "./components/AdvancedSettings";
+
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-import ResultDisplay from "./components/ResultDisplay";
+
 import { Outlet } from "react-router-dom";
 
 function MainScreen() {

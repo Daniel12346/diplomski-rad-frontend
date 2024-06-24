@@ -4,6 +4,7 @@ import { useRecoilState } from "recoil";
 import { socialMediaStatsState } from "../recoil/state";
 import { useEffect } from "react";
 import getSocialMediaStats from "../functions/getSocialMediaStats";
+import { useColorMode } from "@chakra-ui/react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -39,10 +40,11 @@ const SocialMediaChart = () => {
   const [socialMediaStats, SetSocialMediaStats] = useRecoilState(
     socialMediaStatsState
   );
+  const { colorMode } = useColorMode();
+
   const fetchStats = () => {
     getSocialMediaStats()
       .then((response) => {
-        console.log(response);
         SetSocialMediaStats(response.socialMediaStats);
       })
       .catch((error) => {
@@ -82,7 +84,20 @@ const SocialMediaChart = () => {
     ],
   };
 
-  return <Pie data={data} />;
+  return (
+    <Pie
+      data={data}
+      options={{
+        plugins: {
+          legend: {
+            labels: {
+              color: colorMode === "light" ? "black" : "white",
+            },
+          },
+        },
+      }}
+    />
+  );
 };
 
 export default SocialMediaChart;

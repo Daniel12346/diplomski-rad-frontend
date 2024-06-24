@@ -68,8 +68,12 @@ const Controls = () => {
     //whether the image is AI generated
     //TODO: find a better name for this variable
     let result: "FAKE" | "REAL" | "UNKNOWN" = "UNKNOWN";
-    //TODO:
-    // let socialMediaName = "UNKNOWN";
+    let socialMediaName = "UNKNOWN";
+    //TODO: other social media names
+    let match = imageSrc.match(/facebook|twitter|x\.com/gi);
+    if (match) {
+      socialMediaName = match[0];
+    }
 
     if (shouldCheckDeepfake) {
       const response = await detectDeepfake(hostedUrl);
@@ -92,33 +96,6 @@ const Controls = () => {
           confidence: 0,
         });
       }
-
-      // if (
-      //   deepfakePredictions &&
-      //   deepfakePredictions?.length &&
-      //   deepfakePredictions[0].class === "fake"
-      // ) {
-      //   setDeepfakePredictionResult({
-      //     result: "fake",
-      //     confidence: deepfakePredictions[0].confidence,
-      //   });
-      //   setProcessingStatus("COMPLETED");
-      //   return;
-      // } else if (
-      //   deepfakePredictions &&
-      //   deepfakePredictions?.length &&
-      //   deepfakePredictions[0].class === "real"
-      // ) {
-      //   setDeepfakePredictionResult({
-      //     result: "real",
-      //     confidence: deepfakePredictions[0].confidence,
-      //   });
-      // } else {
-      //   setDeepfakePredictionResult({
-      //     result: "unknown",
-      //     confidence: 0,
-      //   });
-      // }
     }
 
     if (shouldRecognizeFace && result !== "FAKE") {
@@ -131,7 +108,6 @@ const Controls = () => {
     }
     if (shouldSearchRelatedResults) {
       const res = await searchRelatedResults(hostedUrl);
-      console.log(res);
       res?.image_results &&
         setRelatedResults(
           res.image_results.map((result: any) => ({
@@ -144,7 +120,7 @@ const Controls = () => {
     await saveCheckResultData({
       imageUrl: hostedUrl,
       //TODO:
-      socialMediaName: "X",
+      socialMediaName,
       recognizedFace,
       result,
     });

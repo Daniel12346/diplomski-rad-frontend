@@ -4,15 +4,17 @@ import { useRecoilState } from "recoil";
 import { validityStatsState } from "../recoil/state";
 import { useEffect } from "react";
 import getValidityStats from "../functions/getValidityStats";
+import { useColorMode } from "@chakra-ui/react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ValidityChart = () => {
   const [validityStats, setValidityStats] = useRecoilState(validityStatsState);
+  const { colorMode } = useColorMode();
+
   const fetchStats = () => {
     getValidityStats()
       .then((response) => {
-        console.log(response);
         setValidityStats({
           totalImages: response.totalImages,
           fakeImages: response.fakeImages,
@@ -55,7 +57,20 @@ const ValidityChart = () => {
     ],
   };
 
-  return <Pie data={data} />;
+  return (
+    <Pie
+      data={data}
+      options={{
+        plugins: {
+          legend: {
+            labels: {
+              color: colorMode === "light" ? "black" : "white",
+            },
+          },
+        },
+      }}
+    />
+  );
 };
 
 export default ValidityChart;
