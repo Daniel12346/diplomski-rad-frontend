@@ -19,13 +19,19 @@ const ResultDisplay = () => {
       <Stack gap={5} px="3" pb="5" borderColor={"blue.300"}>
         <Box>
           {recognizedFaces && (
-            <Flex>
-              <Text>Recognized faces:</Text>
-              <Box>
-                {recognizedFaces.map((name) => (
-                  <Text key={name}>{name}</Text>
-                ))}
-              </Box>
+            <Flex fontSize="xl">
+              {recognizedFaces.every((name) => name === "UNKNOWN") ? (
+                <Text>Could not recognize any faces</Text>
+              ) : (
+                <Box>
+                  <Text>Recognized faces: </Text>
+                  <Box>
+                    {recognizedFaces.map((name) => (
+                      <Text key={name}>{name}</Text>
+                    ))}
+                  </Box>
+                </Box>
+              )}
             </Flex>
           )}
         </Box>
@@ -48,7 +54,7 @@ const ResultDisplay = () => {
                 textAlign={"start"}
                 p={3}
                 background={"green.100"}
-                color="green.600"
+                color="green.700"
                 borderLeft={"2px"}
                 borderLeftColor={"green.400"}
               >

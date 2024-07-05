@@ -56,27 +56,33 @@ const Controls = () => {
     shouldSearchRelatedResults,
   }: RequestParams) => {
     setProcessingStatus("LOADING");
-    //TODO: don't need both image and imageSrc, upload image to hosting service and use the url
-    if (!image || !imageSrc) return;
+    if (!image && !imageSrc) return;
 
-    const hostedUrl = await uploadImageToHostingService(image);
+    let hostedUrl = imageSrc;
+    if (image) {
+      hostedUrl = await uploadImageToHostingService(image);
+    }
+    if (!hostedUrl) {
+      setProcessingStatus("COMPLETED");
+      return;
+    }
 
     let deepfakePredictions = null;
 
     //TODO: either use recognizedFaces or recognizedFace both in client and server
     let recognizedFace = "UNKNOWN";
     //whether the image is AI generated
-    //TODO: find a better name for this variable
     let result: "FAKE" | "REAL" | "UNKNOWN" = "UNKNOWN";
     let socialMediaName = "UNKNOWN";
     //TODO: other social media names
-    let match = imageSrc.match(/facebook|twitter|x\.com/gi);
+    let match = imageSrc?.match(/facebook|twitter|x\.com|instagram/gi);
     if (match) {
       socialMediaName = match[0];
     }
 
     if (shouldCheckDeepfake) {
       const response = await detectDeepfake(hostedUrl);
+      console.log("response", response);
       deepfakePredictions = response?.predictions;
       if (deepfakePredictions && deepfakePredictions?.length) {
         result = deepfakePredictions[0].class.toLocaleUpperCase() as
@@ -98,10 +104,12 @@ const Controls = () => {
       }
     }
 
+    //TODO: add timeout?
     if (shouldRecognizeFace && result !== "FAKE") {
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
         hostedUrl
       );
+      console.log("recogn", recognizedFaces);
       recognizedFace = recognizedFaces ? recognizedFaces[0] : "UNKNOWN";
       setRecognizedFaces(recognizedFaces);
       setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
@@ -129,13 +137,7 @@ const Controls = () => {
   };
 
   return (
-    <SimpleGrid
-      height={"4rem"}
-      columns={3}
-      alignItems={"center"}
-      mb={4}
-      w={"100%"}
-    >
+    <SimpleGrid height={"4rem"} columns={3} alignItems={"center"} w={"100%"}>
       <DeleteIcon
         _hover={{ filter: "brightness(0.8)" }}
         onClick={() => {

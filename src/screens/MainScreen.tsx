@@ -5,7 +5,7 @@ import ResultDisplay from "../components/ResultDisplay";
 
 const MainScreen = () => {
   return (
-    <Stack>
+    <Stack gap={4}>
       <AdvancedSettings />
       <Center>
         <ImageInputArea />

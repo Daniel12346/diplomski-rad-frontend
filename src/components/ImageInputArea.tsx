@@ -9,6 +9,7 @@ import {
   Image,
   InputGroup,
   InputRightElement,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -24,6 +25,7 @@ const ImageInputArea = () => {
   const [imageSrc, setImageSrc] = useRecoilState(imageSrcState);
   const boundingBoxOverlaySrc = useRecoilValue(boundingBoxOverlaySrcState);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bg = useColorModeValue("blue.50", "blue.900");
 
   const onImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedImage = e.target.files?.[0];
@@ -50,6 +52,7 @@ const ImageInputArea = () => {
   return (
     <Stack rounded="md">
       <Center
+        bg={bg}
         borderWidth={2}
         borderColor={"gray.400"}
         borderStyle={imageSrc ? "none" : "dashed"}
@@ -65,23 +68,30 @@ const ImageInputArea = () => {
         />
 
         {imageSrc ? (
-          <Stack px="0.5rem">
-            <Box position={"relative"}>
-              <Image src={imageSrc} alt="preview" w={"100%"} maxWidth="50ch" />
-              <Image
-                hidden={!boundingBoxOverlaySrc}
-                src={boundingBoxOverlaySrc || ""}
-                id="overlay"
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  zIndex: 1,
-                }}
-              />
-            </Box>
+          <Stack p="0.5rem" w="100vw" maxW={"md"}>
+            <Center>
+              <Box position={"relative"}>
+                <Image
+                  src={imageSrc}
+                  alt="preview"
+                  w={"100%"}
+                  maxWidth="50ch"
+                />
+                <Image
+                  hidden={!boundingBoxOverlaySrc}
+                  src={boundingBoxOverlaySrc || ""}
+                  id="overlay"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 1,
+                  }}
+                />
+              </Box>
+            </Center>
             <Controls />
           </Stack>
         ) : (

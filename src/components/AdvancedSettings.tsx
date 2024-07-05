@@ -5,10 +5,12 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
+  Center,
   Container,
   FormControl,
   FormLabel,
   Switch,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useRecoilState } from "recoil";
 import {
@@ -16,38 +18,32 @@ import {
   shouldRecognizeFaceState,
   shouldSearchRelatedResultsState,
 } from "../recoil/state";
+import { SettingsIcon } from "@chakra-ui/icons";
 
 const AdvancedSettings = () => {
   const [shouldRecognizeFace, setShouldRecognizeFace] = useRecoilState(
     shouldRecognizeFaceState
   );
-  const [shuoldCheckDeepfake, setShouldCheckDeepfake] = useRecoilState(
+  const [shouldCheckDeepfake, setShouldCheckDeepfake] = useRecoilState(
     shouldCheckDeepfakeState
   );
   const [shouldSearchRelatedResults, setShouldSearchRelatedResults] =
     useRecoilState(shouldSearchRelatedResultsState);
+  const settingsIconColor = useColorModeValue("gray.700", "gray.300");
 
   return (
-    <Container
-      onClick={() => {
-        console.log(
-          "shouldRecognizeFace, shuoldCheckDeepfake, shouldSearchRelatedResults:",
-          shouldRecognizeFace,
-          shuoldCheckDeepfake,
-          shouldSearchRelatedResults
-        );
-      }}
-    >
+    <Container>
       <Accordion allowToggle mb={2}>
         <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box as="span" textAlign="left">
-                Advanced Settings
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
+          <AccordionButton gap={1}>
+            <Center>
+              <SettingsIcon color={settingsIconColor} />
+            </Center>
+            <Box as="span" textAlign="left">
+              Advanced Settings
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
           <AccordionPanel>
             <FormControl
               display="flex"
@@ -73,7 +69,7 @@ const AdvancedSettings = () => {
               </FormLabel>
               <Switch
                 id="shouldCheckDeepfake"
-                isChecked={shuoldCheckDeepfake}
+                isChecked={shouldCheckDeepfake}
                 onChange={(e) => setShouldCheckDeepfake(e.target.checked)}
               />
             </FormControl>
