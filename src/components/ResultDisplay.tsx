@@ -5,31 +5,55 @@ import {
   deepfakePredictionResultState,
   searchResultsState,
   recognizedFacesState,
+  processingStatusState,
+  shouldRecognizeFaceState,
 } from "../recoil/state";
+import PersonThumbnail from "./PersonThumbnail";
 
 const ResultDisplay = () => {
   const deepfakePredictionResult = useRecoilValue(
     deepfakePredictionResultState
   );
   const relatedResults = useRecoilValue(searchResultsState);
+  const processingStatus = useRecoilValue(processingStatusState);
+  const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
 
   const recognizedFaces = useRecoilValue(recognizedFacesState);
   return (
     <Container pb="5">
       <Stack gap={5} px="3" pb="5" borderColor={"blue.300"}>
         <Box>
+          {!recognizedFaces &&
+            processingStatus === "COMPLETED" &&
+            shouldRecognizeFace && (
+              <Text fontSize={"xl"}>No faces were found in the image</Text>
+            )}
           {recognizedFaces && (
-            <Flex fontSize="xl">
-              {recognizedFaces.every((name) => name === "UNKNOWN") ? (
-                <Text>Could not recognize any faces</Text>
+            <Flex fontSize="xl" fontWeight={"350"}>
+              {recognizedFaces.every(
+                (name) => name.toLocaleUpperCase() === "UNKNOWN"
+              ) ? (
+                <Text>Could not recognize the found faces</Text>
               ) : (
                 <Box>
-                  <Text>Recognized faces: </Text>
-                  <Box>
+                  <Text
+                    _dark={{ color: "blue.100" }}
+                    _light={{ color: "blue.900" }}
+                    mt={2}
+                    mb={2}
+                  >
+                    Recognized faces:{" "}
+                  </Text>
+                  <Stack>
                     {recognizedFaces.map((name) => (
-                      <Text key={name}>{name}</Text>
+                      <Flex key={name} alignItems={"center"} gap={5}>
+                        <Text fontSize="3xl" fontWeight={400} key={name}>
+                          {name}
+                        </Text>
+                        <PersonThumbnail name={name} />
+                      </Flex>
                     ))}
-                  </Box>
+                  </Stack>
                 </Box>
               )}
             </Flex>

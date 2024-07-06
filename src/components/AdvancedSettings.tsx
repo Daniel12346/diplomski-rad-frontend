@@ -11,6 +11,7 @@ import {
   FormLabel,
   Switch,
   useColorModeValue,
+  Text,
 } from "@chakra-ui/react";
 import { useRecoilState } from "recoil";
 import {
@@ -39,18 +40,26 @@ const AdvancedSettings = () => {
             <Center>
               <SettingsIcon color={settingsIconColor} />
             </Center>
-            <Box as="span" textAlign="left">
+            <Box as="span" textAlign="left" fontWeight={400}>
               Advanced Settings
             </Box>
             <AccordionIcon />
           </AccordionButton>
-          <AccordionPanel>
+          <AccordionPanel
+            _dark={{ color: "gray.300" }}
+            _light={{ color: "gray.700" }}
+          >
             <FormControl
               display="flex"
               alignItems="center"
               justifyContent="space-between"
+              mb={1}
             >
-              <FormLabel htmlFor="shouldRecognizeFace" fontWeight="normal">
+              <FormLabel
+                htmlFor="shouldRecognizeFace"
+                fontWeight={"normal"}
+                margin={0}
+              >
                 recognize face
               </FormLabel>
               <Switch
@@ -63,8 +72,13 @@ const AdvancedSettings = () => {
               display="flex"
               alignItems="center"
               justifyContent="space-between"
+              mb={1}
             >
-              <FormLabel htmlFor="shouldCheckDeepfake" fontWeight="normal">
+              <FormLabel
+                htmlFor="shouldCheckDeepfake"
+                fontWeight="normal"
+                margin={0}
+              >
                 check deepfake
               </FormLabel>
               <Switch
@@ -81,8 +95,9 @@ const AdvancedSettings = () => {
               <FormLabel
                 htmlFor="shouldSearchRelatedResults"
                 fontWeight="normal"
+                margin={0}
               >
-                search related results
+                <Text>search related results</Text>
               </FormLabel>
               <Switch
                 id="shouldSearchRelatedResults"

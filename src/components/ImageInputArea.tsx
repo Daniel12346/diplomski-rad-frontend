@@ -10,6 +10,7 @@ import {
   InputGroup,
   InputRightElement,
   useColorModeValue,
+  Container,
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -25,7 +26,7 @@ const ImageInputArea = () => {
   const [imageSrc, setImageSrc] = useRecoilState(imageSrcState);
   const boundingBoxOverlaySrc = useRecoilValue(boundingBoxOverlaySrcState);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const bg = useColorModeValue("blue.50", "blue.900");
+  const bg = useColorModeValue("gray.100", "blue.900");
 
   const onImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedImage = e.target.files?.[0];
@@ -92,7 +93,9 @@ const ImageInputArea = () => {
                 />
               </Box>
             </Center>
-            <Controls />
+            <Container px="6">
+              <Controls />
+            </Container>
           </Stack>
         ) : (
           <FormLabel
@@ -115,13 +118,14 @@ const ImageInputArea = () => {
           <Input
             size="sm"
             alignSelf={"center"}
-            _placeholder={{ color: "blue.400" }}
+            _placeholder={{ color: "blue.400", fontSize: "md" }}
             type="url"
             mt={1}
             border={"2px solid"}
             borderColor={"gray.400"}
             placeholder="or paste an image url"
             ref={fileInputRef}
+            p={1}
           />
           <InputRightElement
             display={"flex"}

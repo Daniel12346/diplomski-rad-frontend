@@ -13,8 +13,8 @@ const getPersonThumbnail = async (name: string) => {
         },
       }
     );
-    const thumbnail = response.data;
-    return { thumbnail };
+    const { data } = response;
+    return { data };
   } catch (error) {
     console.log(error);
   }
