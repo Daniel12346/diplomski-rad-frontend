@@ -1,5 +1,11 @@
 import { DeleteIcon, SearchIcon } from "@chakra-ui/icons";
-import { SimpleGrid, Center, Spinner, Circle } from "@chakra-ui/react";
+import {
+  SimpleGrid,
+  Center,
+  Spinner,
+  Circle,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
   imageState,
@@ -40,6 +46,7 @@ const Controls = () => {
   const setDeepfakePredictionResult = useSetRecoilState(
     deepfakePredictionResultState
   );
+  const controlsBgColor = useColorModeValue("blue.100", "blue.800");
 
   interface RequestParams {
     image: File | null;
@@ -105,7 +112,7 @@ const Controls = () => {
     }
 
     //TODO: add timeout?
-    if (shouldRecognizeFace && result !== "FAKE") {
+    if (shouldRecognizeFace) {
       const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
         hostedUrl
       );
@@ -125,9 +132,11 @@ const Controls = () => {
           }))
         );
     }
+    const confidence =
+      (deepfakePredictions && deepfakePredictions[0].confidence) || undefined;
     await saveCheckResultData({
       imageUrl: hostedUrl,
-      //TODO:
+      confidence,
       socialMediaName,
       recognizedFace,
       result,
@@ -137,7 +146,14 @@ const Controls = () => {
   };
 
   return (
-    <SimpleGrid height={"4rem"} columns={3} alignItems={"center"} w={"100%"}>
+    <SimpleGrid
+      height={"4rem"}
+      columns={3}
+      alignItems={"center"}
+      bg={controlsBgColor}
+      w={"100%"}
+      px="2"
+    >
       <DeleteIcon
         _hover={{ filter: "brightness(0.8)" }}
         onClick={() => {

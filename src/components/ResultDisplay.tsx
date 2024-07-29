@@ -14,6 +14,7 @@ const ResultDisplay = () => {
   const deepfakePredictionResult = useRecoilValue(
     deepfakePredictionResultState
   );
+
   const relatedResults = useRecoilValue(searchResultsState);
   const processingStatus = useRecoilValue(processingStatusState);
   const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
@@ -39,8 +40,8 @@ const ResultDisplay = () => {
                   <Text
                     _dark={{ color: "blue.100" }}
                     _light={{ color: "blue.900" }}
-                    mt={2}
-                    mb={2}
+                    mt={3}
+                    mb={1}
                   >
                     Recognized faces:{" "}
                   </Text>

@@ -33,7 +33,7 @@ const AdvancedSettings = () => {
   const settingsIconColor = useColorModeValue("gray.700", "gray.300");
 
   return (
-    <Container>
+    <Container w="100%" maxW="25rem">
       <Accordion allowToggle mb={2}>
         <AccordionItem>
           <AccordionButton gap={1}>

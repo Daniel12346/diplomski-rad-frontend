@@ -6,18 +6,20 @@ interface SaveCheckResultDataProps {
   socialMediaName: string;
   recognizedFace: string;
   result: "FAKE" | "REAL" | "UNKNOWN";
+  confidence: number | undefined;
 }
 const saveCheckResultData = async ({
   imageUrl,
   socialMediaName,
   recognizedFace,
   result,
+  confidence,
 }: SaveCheckResultDataProps) => {
   if (imageUrl && socialMediaName && recognizedFace && result) {
     try {
       const response = await axios.post(
         import.meta.env.VITE_CHECK_RESULTS_API_URL + "/save-result-data",
-        { imageUrl, socialMediaName, recognizedFace, result },
+        { imageUrl, socialMediaName, recognizedFace, result, confidence },
         {
           headers: {
             "Content-Type": "application/json",
