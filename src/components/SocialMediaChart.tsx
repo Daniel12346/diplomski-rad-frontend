@@ -4,7 +4,7 @@ import { useRecoilState } from "recoil";
 import { socialMediaStatsState } from "../recoil/state";
 import { useEffect } from "react";
 import getSocialMediaStats from "../functions/getSocialMediaStats";
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode, useMediaQuery } from "@chakra-ui/react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -41,6 +41,7 @@ const SocialMediaChart = () => {
     socialMediaStatsState
   );
   const { colorMode } = useColorMode();
+  const [isLargerThan720] = useMediaQuery("(min-width: 720px)");
 
   const fetchStats = () => {
     getSocialMediaStats()
@@ -90,11 +91,13 @@ const SocialMediaChart = () => {
       options={{
         plugins: {
           legend: {
+            position: isLargerThan720 ? "right" : "top",
             labels: {
               color: colorMode === "light" ? "black" : "white",
             },
           },
         },
+        normalized: true,
       }}
     />
   );

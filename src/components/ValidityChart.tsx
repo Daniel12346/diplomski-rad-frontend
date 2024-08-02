@@ -4,13 +4,14 @@ import { useRecoilState } from "recoil";
 import { validityStatsState } from "../recoil/state";
 import { useEffect } from "react";
 import getValidityStats from "../functions/getValidityStats";
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode, useMediaQuery } from "@chakra-ui/react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ValidityChart = () => {
   const [validityStats, setValidityStats] = useRecoilState(validityStatsState);
   const { colorMode } = useColorMode();
+  const [isLargerThan720] = useMediaQuery("(min-width: 720px)");
 
   const fetchStats = () => {
     getValidityStats()
@@ -63,6 +64,7 @@ const ValidityChart = () => {
       options={{
         plugins: {
           legend: {
+            position: isLargerThan720 ? "right" : "top",
             labels: {
               color: colorMode === "light" ? "black" : "white",
             },

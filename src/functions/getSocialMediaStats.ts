@@ -14,8 +14,8 @@ const getSocialMediaStats = async () => {
     return { socialMediaStats };
   } catch (error) {
     console.log(error);
+    return {};
   }
-  return {};
 };
 
 export default getSocialMediaStats;

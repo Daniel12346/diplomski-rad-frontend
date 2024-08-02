@@ -1,6 +1,5 @@
 import { Stack, Link, Box, Text } from "@chakra-ui/react";
 
-//TODO:type
 const RelatedSearchResults = ({ results }: any) => {
   return results?.length > 0 ? (
     <Box>

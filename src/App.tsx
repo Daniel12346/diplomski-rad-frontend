@@ -5,6 +5,7 @@ import {
   useColorMode,
   Spacer,
   Flex,
+  Stack,
 } from "@chakra-ui/react";
 
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
@@ -14,12 +15,10 @@ import { Outlet } from "react-router-dom";
 function MainScreen() {
   const { toggleColorMode, colorMode } = useColorMode();
   return (
-    <Box>
-      <Flex px={4} py={2}>
+    <Stack maxWidth="100vw">
+      <Flex gap={2} p="2">
         <Spacer />
-        <Center pr={2}>
-          {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-        </Center>
+        <Center>{colorMode === "light" ? <MoonIcon /> : <SunIcon />}</Center>
         <Switch
           onChange={() => {
             toggleColorMode();
@@ -29,7 +28,7 @@ function MainScreen() {
       <Center>
         <Outlet />
       </Center>
-    </Box>
+    </Stack>
   );
 }
 

@@ -1,31 +1,32 @@
-import { Container, Heading, SimpleGrid, Stack, Text } from "@chakra-ui/react";
+import { Container, Heading } from "@chakra-ui/react";
 import SocialMediaChart from "../components/SocialMediaChart";
 import ValidityChart from "../components/ValidityChart";
+import ResultHistory from "../components/ResultHistory";
 
 const AdminScreen = () => {
   return (
-    <Stack>
-      <Heading mb={6}>Admin Screen</Heading>
-      <SimpleGrid
-        columns={{ sm: 1, md: 2 }}
-        spacing={"4rem"}
-        _dark={{ color: "gray.200" }}
-        _light={{ color: "gray.700" }}
+    <Container placeContent={"center"} maxWidth="100vw">
+      <Container>
+        <Heading mb={6}>Admin Screen</Heading>
+      </Container>
+      <Container
+        maxWidth={"60rem"}
+        display="flex"
+        gap={8}
+        flexFlow={"row wrap"}
       >
-        <Container>
-          <Text pl="4" fontSize={"lg"} mb={2}>
-            Image validity
-          </Text>
+        <Container maxWidth="25rem">
           <ValidityChart />
         </Container>
-        <Container>
-          <Text pl="4" fontSize={"lg"} mb={2}>
-            Social media
-          </Text>
+        <Container maxWidth="25rem">
           <SocialMediaChart />
         </Container>
-      </SimpleGrid>
-    </Stack>
+      </Container>
+      <Container>
+        <Heading mb={6}>Result history</Heading>
+        <ResultHistory />
+      </Container>
+    </Container>
   );
 };
 export default AdminScreen;

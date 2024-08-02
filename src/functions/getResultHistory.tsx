@@ -1,13 +1,11 @@
 import axios from "axios";
 
-const getPersonThumbnail = async (name: string) => {
+//TODO: type
+const getResultHistory = async () => {
   try {
     const response = await axios.get(
-      import.meta.env.VITE_CHECK_RESULTS_API_URL + "/person-thumbnail",
+      import.meta.env.VITE_CHECK_RESULTS_API_URL + "/result-history",
       {
-        params: {
-          name,
-        },
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
@@ -21,4 +19,4 @@ const getPersonThumbnail = async (name: string) => {
   }
 };
 
-export default getPersonThumbnail;
+export default getResultHistory;

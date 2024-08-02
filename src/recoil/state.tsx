@@ -29,11 +29,11 @@ export const deepfakePredictionResultState = atom<{
   default: null,
 });
 
-interface SearchResult {
+type SearchResult = {
   title: string;
   favicon: string;
   redirect_link: string;
-}
+};
 export const searchResultsState = atom<SearchResult[] | null>({
   key: "searchResultsState",
   default: null,
@@ -72,5 +72,20 @@ type SocialMediaStat = {
 
 export const socialMediaStatsState = atom<SocialMediaStat[] | null>({
   key: "socialMediaStatsState",
+  default: null,
+});
+
+type ResultHistory = {
+  imageUrl: string;
+  socialMediaName: string;
+  recognizedFace: string;
+  result: "FAKE" | "REAL" | "UNKNOWN";
+  createdAt: string;
+  updatedAt: string;
+  confidence?: number;
+}[];
+
+export const resultHistoryState = atom<ResultHistory | null>({
+  key: "resultHistoryState",
   default: null,
 });
