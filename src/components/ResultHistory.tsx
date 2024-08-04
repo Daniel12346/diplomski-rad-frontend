@@ -86,7 +86,7 @@ export default function ResultHistory() {
         </Select>
         <RadioGroup defaultValue={validityFilter}>
           <SimpleGrid columns={3} spacing={2}>
-            <Radio value="fake" onClick={handleSelectValidity}>
+            <Radio value="fake" onChange={handleSelectValidity}>
               fake
             </Radio>
             <Radio value="real" onChange={handleSelectValidity}>
@@ -118,6 +118,7 @@ export default function ResultHistory() {
             return (
               <Container
                 onClick={() => {
+                  console.log(result.result);
                   setModalImage(result.imageUrl);
                   onOpen();
                 }}
