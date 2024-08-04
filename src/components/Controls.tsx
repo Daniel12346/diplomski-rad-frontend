@@ -10,25 +10,30 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
   imageState,
   imageSrcState,
-  recognizedFacesState,
+  // recognizedFacesState,
   searchResultsState,
   boundingBoxOverlaySrcState,
   processingStatusState,
   deepfakePredictionResultState,
   shouldCheckDeepfakeState,
-  shouldRecognizeFaceState,
+  // shouldRecognizeFaceState,
   shouldSearchRelatedResultsState,
 } from "../recoil/state";
 import detectDeepfake from "../functions/detectDeepfake";
-import recognizeFace from "../functions/recognizeFace";
+// import recognizeFace from "../functions/recognizeFace";
 import searchRelatedResults from "../functions/searchRelatedResults";
 import uploadImageToHostingService from "../functions/uploadImageToHostingService";
 import saveCheckResultData from "../functions/saveCheckResultData";
+import { Dispatch } from "react";
 
-const Controls = () => {
+type ControlsProps = {
+  detectFaces: () => void;
+  setError: Dispatch<string | null>;
+};
+const Controls = ({ detectFaces, setError }: ControlsProps) => {
   const image = useRecoilValue(imageState);
   const imageSrc = useRecoilValue(imageSrcState);
-  const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
+  // const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
   const shouldCheckDeepfake = useRecoilValue(shouldCheckDeepfakeState);
   const shouldSearchRelatedResults = useRecoilValue(
     shouldSearchRelatedResultsState
@@ -37,7 +42,7 @@ const Controls = () => {
   const processingStatus = useRecoilValue(processingStatusState);
   const setImage = useSetRecoilState(imageState);
   const setImageSrc = useSetRecoilState(imageSrcState);
-  const setRecognizedFaces = useSetRecoilState(recognizedFacesState);
+  // const setRecognizedFaces = useSetRecoilState(recognizedFacesState);
   const setRelatedResults = useSetRecoilState(searchResultsState);
   const setboundingBoxOverlaySrc = useSetRecoilState(
     boundingBoxOverlaySrcState
@@ -51,25 +56,35 @@ const Controls = () => {
   interface RequestParams {
     image: File | null;
     imageSrc: string | null;
-    shouldRecognizeFace: boolean;
+    // shouldRecognizeFace: boolean;
     shouldCheckDeepfake: boolean;
     shouldSearchRelatedResults: boolean;
   }
   const onStartRequest = async ({
     image,
     imageSrc,
-    shouldRecognizeFace,
+    // shouldRecognizeFace,
     shouldCheckDeepfake,
     shouldSearchRelatedResults,
   }: RequestParams) => {
     setProcessingStatus("LOADING");
+
     if (!image && !imageSrc) return;
 
     let hostedUrl = imageSrc;
-    if (image) {
-      hostedUrl = await uploadImageToHostingService(image);
-    }
-    if (!hostedUrl) {
+    await detectFaces();
+    console.log(image);
+    try {
+      if (imageSrc) {
+        hostedUrl = await uploadImageToHostingService(imageSrc);
+      }
+
+      if (!hostedUrl) {
+        setProcessingStatus("COMPLETED");
+        return;
+      }
+    } catch (err) {
+      setError("Error uploading image");
       setProcessingStatus("COMPLETED");
       return;
     }
@@ -77,7 +92,7 @@ const Controls = () => {
     let deepfakePredictions = null;
 
     //TODO: either use recognizedFaces or recognizedFace both in client and server
-    let recognizedFace = "UNKNOWN";
+    // let recognizedFace = "UNKNOWN";
     //whether the image is AI generated
     let result: "FAKE" | "REAL" | "UNKNOWN" = "UNKNOWN";
     let socialMediaName = "UNKNOWN";
@@ -112,15 +127,15 @@ const Controls = () => {
     }
 
     //TODO: add timeout?
-    if (shouldRecognizeFace) {
-      const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
-        hostedUrl
-      );
-      console.log("recogn", recognizedFaces);
-      recognizedFace = recognizedFaces ? recognizedFaces[0] : "UNKNOWN";
-      setRecognizedFaces(recognizedFaces);
-      setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
-    }
+    // if (shouldRecognizeFace) {
+    //   const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
+    //     hostedUrl
+    //   );
+    //   console.log("recogn", recognizedFaces);
+    //   recognizedFace = recognizedFaces ? recognizedFaces[0] : "UNKNOWN";
+    //   setRecognizedFaces(recognizedFaces);
+    //   setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
+    // }
     if (shouldSearchRelatedResults) {
       const res = await searchRelatedResults(hostedUrl);
       res?.image_results &&
@@ -138,7 +153,7 @@ const Controls = () => {
       imageUrl: hostedUrl,
       confidence,
       socialMediaName,
-      recognizedFace,
+      // recognizedFace,
       result,
     });
 
@@ -157,9 +172,10 @@ const Controls = () => {
       <DeleteIcon
         _hover={{ filter: "brightness(0.8)" }}
         onClick={() => {
+          setError(null);
           setImage(null);
           setImageSrc(null);
-          setRecognizedFaces(null);
+          // setRecognizedFaces(null);
           setRelatedResults(null);
           setboundingBoxOverlaySrc(null);
           setProcessingStatus("IDLE");
@@ -183,7 +199,7 @@ const Controls = () => {
               onStartRequest({
                 image,
                 imageSrc,
-                shouldRecognizeFace,
+                // shouldRecognizeFace,
                 shouldCheckDeepfake,
                 shouldSearchRelatedResults,
               })

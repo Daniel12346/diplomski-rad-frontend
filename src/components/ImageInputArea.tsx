@@ -10,31 +10,73 @@ import {
   InputRightElement,
   useColorModeValue,
   Container,
+  Button,
+  Alert,
+  CloseButton,
 } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import {
-  boundingBoxOverlaySrcState,
-  imageSrcState,
-  imageState,
-} from "../recoil/state";
+import { useEffect, useRef, useState } from "react";
+import { useRecoilState } from "recoil";
+import { imageSrcState, imageState } from "../recoil/state";
 import Controls from "./Controls";
 import { FileUploader } from "react-drag-drop-files";
+import * as faceapi from "face-api.js";
 
 const ImageInputArea = () => {
+  const MODEL_URL = "/models";
   const [image, setImage] = useRecoilState(imageState);
   const [imageSrc, setImageSrc] = useRecoilState(imageSrcState);
-  const boundingBoxOverlaySrc = useRecoilValue(boundingBoxOverlaySrcState);
+  // const boundingBoxOverlaySrc = useRecoilValue(boundingBoxOverlaySrcState);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bg = useColorModeValue("gray.100", "blue.900");
+  const imgRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const detectFaces = async () => {
+    console.log(canvasRef.current, imgRef.current);
+    if (imgRef.current && canvasRef.current) {
+      const img = imgRef.current;
+      const canvas = canvasRef.current;
+      const displaySize = { width: img.width, height: img.height };
+      faceapi.matchDimensions(canvas, displaySize);
+      const detections = await faceapi.detectAllFaces(img);
+      const resizedDetections = faceapi.resizeResults(detections, displaySize);
+      canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+      faceapi.draw.drawDetections(canvas, resizedDetections);
+    }
+  };
 
   useEffect(() => {
+    const loadModels = async () => {
+      try {
+        await faceapi.loadSsdMobilenetv1Model("/models");
+        await faceapi.loadFaceLandmarkModel(MODEL_URL);
+        // await faceapi.loadFaceRecognitionModel(MODEL_URL);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    loadModels();
+  }, []);
+  useEffect(() => {
     if (image) {
+      //TODO: check if image is too large
+      // console.log(image.size, image.size / 1024);
+      // if (image.size / 1024 > 20) {
+      //   console.log("file too large");
+      //   setError("File too large. Please upload a smaller file.");
+      //   return;
+      // } else {
+      //   if (error) {
+      //     setError(null);
+      //   }
+      // }
       const reader = new FileReader();
       reader.onload = () => {
+        console.log(reader.result);
         setImageSrc(reader.result as string);
       };
       reader.readAsDataURL(image);
+      setError(null);
     }
     if (!image) {
       setImageSrc(null);
@@ -59,32 +101,30 @@ const ImageInputArea = () => {
           justifyContent={"center"}
         >
           <FileUploader
-            handleChange={(file: File) => {
-              console.log(file);
+            handleChange={async (file: File) => {
               setImage(file);
             }}
             children={
               imageSrc ? (
                 <Box>
                   <Image
+                    ref={imgRef}
                     src={imageSrc || ""}
                     alt="preview"
                     w={"100%"}
                     maxWidth="50ch"
                   />
-                  <Image
-                    hidden={!boundingBoxOverlaySrc}
-                    src={boundingBoxOverlaySrc || ""}
-                    id="overlay"
+                  <canvas
+                    ref={canvasRef}
                     style={{
                       position: "absolute",
                       top: 0,
                       left: 0,
                       width: "100%",
                       height: "100%",
-                      zIndex: 1,
+                      zIndex: 0,
                     }}
-                  />
+                  ></canvas>
                 </Box>
               ) : (
                 <Container h="100%" placeContent={"center"} cursor={"pointer"}>
@@ -103,7 +143,7 @@ const ImageInputArea = () => {
         <Stack p="0.5rem" w="100vw" maxW={"md"}>
           <Center></Center>
           <Container px="6">
-            <Controls />
+            <Controls detectFaces={detectFaces} setError={setError} />
           </Container>
         </Stack>
       )}
@@ -136,6 +176,17 @@ const ImageInputArea = () => {
             <ArrowForwardIcon boxSize={8} color="blue.100" bg="blue.500" />
           </InputRightElement>
         </InputGroup>
+      )}
+      {error && (
+        <Alert status="error">
+          <Text fontSize="sm">{error}</Text>
+          <CloseButton
+            position="absolute"
+            right="8px"
+            top="8px"
+            onClick={() => setError(null)}
+          />
+        </Alert>
       )}
     </Stack>
   );

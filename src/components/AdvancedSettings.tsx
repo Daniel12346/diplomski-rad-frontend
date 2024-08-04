@@ -16,15 +16,15 @@ import {
 import { useRecoilState } from "recoil";
 import {
   shouldCheckDeepfakeState,
-  shouldRecognizeFaceState,
+  // shouldRecognizeFaceState,
   shouldSearchRelatedResultsState,
 } from "../recoil/state";
 import { SettingsIcon } from "@chakra-ui/icons";
 
 const AdvancedSettings = () => {
-  const [shouldRecognizeFace, setShouldRecognizeFace] = useRecoilState(
-    shouldRecognizeFaceState
-  );
+  // const [shouldRecognizeFace, setShouldRecognizeFace] = useRecoilState(
+  //   shouldRecognizeFaceState
+  // );
   const [shouldCheckDeepfake, setShouldCheckDeepfake] = useRecoilState(
     shouldCheckDeepfakeState
   );
@@ -49,7 +49,7 @@ const AdvancedSettings = () => {
             _dark={{ color: "gray.300" }}
             _light={{ color: "gray.700" }}
           >
-            <FormControl
+            {/* <FormControl
               display="flex"
               alignItems="center"
               justifyContent="space-between"
@@ -67,7 +67,7 @@ const AdvancedSettings = () => {
                 isChecked={shouldRecognizeFace}
                 onChange={(e) => setShouldRecognizeFace(e.target.checked)}
               />
-            </FormControl>
+            </FormControl> */}
             <FormControl
               display="flex"
               alignItems="center"

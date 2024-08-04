@@ -6,9 +6,11 @@ import { RecoilRoot } from "recoil";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminScreen from "./screens/AdminScreen";
 import MainScreen from "./screens/MainScreen";
+import ErrorScreen from "./screens/ErrorScreen";
 
 const router = createBrowserRouter([
   {
+    errorElement: <ErrorScreen />,
     path: "/",
     element: <App />,
     children: [

@@ -134,9 +134,7 @@ export default function ResultHistory() {
                       width="100%"
                       objectFit={"cover"}
                     />
-                    {/* <Text>
-                      {result.result} with confidence: {result.confidence}
-                    </Text> */}
+
                     <ModalFooter>
                       <Button onClick={onClose}>Close</Button>
                     </ModalFooter>
@@ -170,7 +168,7 @@ export default function ResultHistory() {
                   </Flex>
                   <Box>
                     <Text fontSize="small"> with confidence:</Text>{" "}
-                    {result.confidence}
+                    {result.confidence?.toPrecision(3)}
                   </Box>
                 </Box>
               </Container>

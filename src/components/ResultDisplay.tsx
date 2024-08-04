@@ -1,14 +1,12 @@
-import { Container, Stack, Flex, Box, Text } from "@chakra-ui/react";
+import { Container, Stack, Box, Text } from "@chakra-ui/react";
 import RelatedResults from "./RelatedSearchResults";
 import { useRecoilValue } from "recoil";
 import {
   deepfakePredictionResultState,
   searchResultsState,
-  recognizedFacesState,
-  processingStatusState,
-  shouldRecognizeFaceState,
+  // recognizedFacesState,
+  // shouldRecognizeFaceState,
 } from "../recoil/state";
-import PersonThumbnail from "./PersonThumbnail";
 
 const ResultDisplay = () => {
   const deepfakePredictionResult = useRecoilValue(
@@ -16,14 +14,13 @@ const ResultDisplay = () => {
   );
 
   const relatedResults = useRecoilValue(searchResultsState);
-  const processingStatus = useRecoilValue(processingStatusState);
-  const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
+  // const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
 
-  const recognizedFaces = useRecoilValue(recognizedFacesState);
+  // const recognizedFaces = useRecoilValue(recognizedFacesState);
   return (
     <Container pb="5">
       <Stack gap={5} px="3" pb="5" borderColor={"blue.300"}>
-        <Box>
+        {/* <Box>
           {!recognizedFaces &&
             processingStatus === "COMPLETED" &&
             shouldRecognizeFace && (
@@ -59,7 +56,7 @@ const ResultDisplay = () => {
               )}
             </Flex>
           )}
-        </Box>
+        </Box> */}
         {deepfakePredictionResult && (
           <Box>
             {deepfakePredictionResult.result === "FAKE" ? (
