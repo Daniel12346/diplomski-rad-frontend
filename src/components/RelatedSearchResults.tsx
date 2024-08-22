@@ -32,9 +32,7 @@ const RelatedSearchResults = ({ results }: any) => {
       </Stack>
     </Box>
   ) : (
-    <Text onClick={() => console.log(results.results)}>
-      No related results found
-    </Text>
+    <Text>No related results found</Text>
   );
 };
 

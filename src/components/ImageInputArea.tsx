@@ -10,13 +10,16 @@ import {
   InputRightElement,
   useColorModeValue,
   Container,
-  Button,
   Alert,
   CloseButton,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import { useRecoilState } from "recoil";
-import { imageSrcState, imageState } from "../recoil/state";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import {
+  imageSrcState,
+  imageState,
+  processingStatusState,
+} from "../recoil/state";
 import Controls from "./Controls";
 import { FileUploader } from "react-drag-drop-files";
 import * as faceapi from "face-api.js";
@@ -25,23 +28,35 @@ const ImageInputArea = () => {
   const MODEL_URL = "/models";
   const [image, setImage] = useRecoilState(imageState);
   const [imageSrc, setImageSrc] = useRecoilState(imageSrcState);
-  // const boundingBoxOverlaySrc = useRecoilValue(boundingBoxOverlaySrcState);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bg = useColorModeValue("gray.100", "blue.900");
   const imgRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const setProcessingStatus = useSetRecoilState(processingStatusState);
+
   const detectFaces = async () => {
-    console.log(canvasRef.current, imgRef.current);
     if (imgRef.current && canvasRef.current) {
+      setProcessingStatus("LOADING");
       const img = imgRef.current;
       const canvas = canvasRef.current;
       const displaySize = { width: img.width, height: img.height };
       faceapi.matchDimensions(canvas, displaySize);
-      const detections = await faceapi.detectAllFaces(img);
-      const resizedDetections = faceapi.resizeResults(detections, displaySize);
-      canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
-      faceapi.draw.drawDetections(canvas, resizedDetections);
+      try {
+        const detections = await faceapi.detectAllFaces(img);
+        const resizedDetections = faceapi.resizeResults(
+          detections,
+          displaySize
+        );
+
+        if (resizedDetections.length === 0) {
+          throw new Error("No faces detected in the image");
+        }
+        canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+        faceapi.draw.drawDetections(canvas, resizedDetections);
+      } catch (e) {
+        throw new Error("Could not detect faces in the image");
+      }
     }
   };
 
@@ -50,7 +65,6 @@ const ImageInputArea = () => {
       try {
         await faceapi.loadSsdMobilenetv1Model("/models");
         await faceapi.loadFaceLandmarkModel(MODEL_URL);
-        // await faceapi.loadFaceRecognitionModel(MODEL_URL);
       } catch (e) {
         console.error(e);
       }
@@ -72,7 +86,6 @@ const ImageInputArea = () => {
       // }
       const reader = new FileReader();
       reader.onload = () => {
-        console.log(reader.result);
         setImageSrc(reader.result as string);
       };
       reader.readAsDataURL(image);
@@ -86,7 +99,6 @@ const ImageInputArea = () => {
   return (
     <Stack rounded="md" align={"center"} w="100%">
       <Center
-        // h={!imageSrc ? "40vh" : "auto"}
         minW={{ sm: "100%", md: "15rem" }}
         w={"100%"}
         bg={bg}

@@ -1,7 +1,6 @@
 import {
   Center,
   Switch,
-  Box,
   useColorMode,
   Spacer,
   Flex,

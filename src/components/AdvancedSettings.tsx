@@ -49,25 +49,6 @@ const AdvancedSettings = () => {
             _dark={{ color: "gray.300" }}
             _light={{ color: "gray.700" }}
           >
-            {/* <FormControl
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              mb={1}
-            >
-              <FormLabel
-                htmlFor="shouldRecognizeFace"
-                fontWeight={"normal"}
-                margin={0}
-              >
-                recognize face
-              </FormLabel>
-              <Switch
-                id="shouldRecognizeFace"
-                isChecked={shouldRecognizeFace}
-                onChange={(e) => setShouldRecognizeFace(e.target.checked)}
-              />
-            </FormControl> */}
             <FormControl
               display="flex"
               alignItems="center"

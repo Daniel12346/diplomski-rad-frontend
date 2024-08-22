@@ -9,14 +9,6 @@ export const imageSrcState = atom<string | null>({
   default: null,
 });
 
-// export const recognizedFacesState = atom<string[] | null>({
-//   key: "recognizedFacesState",
-//   default: null,
-// });
-export const boundingBoxOverlaySrcState = atom<string | null>({
-  key: "boundingBoxOverlaySrcState",
-  default: null,
-});
 export const processingStatusState = atom<"IDLE" | "LOADING" | "COMPLETED">({
   key: "processingStatusState",
   default: "IDLE",
@@ -38,11 +30,6 @@ export const searchResultsState = atom<SearchResult[] | null>({
   key: "searchResultsState",
   default: null,
 });
-
-// export const shouldRecognizeFaceState = atom<boolean>({
-//   key: "shouldRecognizeFaceState",
-//   default: true,
-// });
 
 export const shouldCheckDeepfakeState = atom<boolean>({
   key: "shouldCheckDeepfakeState",
@@ -78,7 +65,6 @@ export const socialMediaStatsState = atom<SocialMediaStat[] | null>({
 type ResultHistory = {
   imageUrl: string;
   socialMediaName: string;
-  // recognizedFace: string;
   result: "FAKE" | "REAL" | "UNKNOWN";
   createdAt: string;
   updatedAt: string;

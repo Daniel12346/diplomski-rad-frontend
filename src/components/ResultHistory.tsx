@@ -118,7 +118,6 @@ export default function ResultHistory() {
             return (
               <Container
                 onClick={() => {
-                  console.log(result.result);
                   setModalImage(result.imageUrl);
                   onOpen();
                 }}

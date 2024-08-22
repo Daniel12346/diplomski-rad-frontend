@@ -10,17 +10,13 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
   imageState,
   imageSrcState,
-  // recognizedFacesState,
   searchResultsState,
-  boundingBoxOverlaySrcState,
   processingStatusState,
   deepfakePredictionResultState,
   shouldCheckDeepfakeState,
-  // shouldRecognizeFaceState,
   shouldSearchRelatedResultsState,
 } from "../recoil/state";
 import detectDeepfake from "../functions/detectDeepfake";
-// import recognizeFace from "../functions/recognizeFace";
 import searchRelatedResults from "../functions/searchRelatedResults";
 import uploadImageToHostingService from "../functions/uploadImageToHostingService";
 import saveCheckResultData from "../functions/saveCheckResultData";
@@ -33,7 +29,6 @@ type ControlsProps = {
 const Controls = ({ detectFaces, setError }: ControlsProps) => {
   const image = useRecoilValue(imageState);
   const imageSrc = useRecoilValue(imageSrcState);
-  // const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
   const shouldCheckDeepfake = useRecoilValue(shouldCheckDeepfakeState);
   const shouldSearchRelatedResults = useRecoilValue(
     shouldSearchRelatedResultsState
@@ -42,11 +37,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
   const processingStatus = useRecoilValue(processingStatusState);
   const setImage = useSetRecoilState(imageState);
   const setImageSrc = useSetRecoilState(imageSrcState);
-  // const setRecognizedFaces = useSetRecoilState(recognizedFacesState);
   const setRelatedResults = useSetRecoilState(searchResultsState);
-  const setboundingBoxOverlaySrc = useSetRecoilState(
-    boundingBoxOverlaySrcState
-  );
   const setProcessingStatus = useSetRecoilState(processingStatusState);
   const setDeepfakePredictionResult = useSetRecoilState(
     deepfakePredictionResultState
@@ -63,7 +54,6 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
   const onStartRequest = async ({
     image,
     imageSrc,
-    // shouldRecognizeFace,
     shouldCheckDeepfake,
     shouldSearchRelatedResults,
   }: RequestParams) => {
@@ -72,8 +62,11 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
     if (!image && !imageSrc) return;
 
     let hostedUrl = imageSrc;
-    await detectFaces();
-    console.log(image);
+    try {
+      await detectFaces();
+    } catch (e) {
+      setError("Could not detect faces in the image");
+    }
     try {
       if (imageSrc) {
         hostedUrl = await uploadImageToHostingService(imageSrc);
@@ -91,9 +84,6 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
 
     let deepfakePredictions = null;
 
-    //TODO: either use recognizedFaces or recognizedFace both in client and server
-    // let recognizedFace = "UNKNOWN";
-    //whether the image is AI generated
     let result: "FAKE" | "REAL" | "UNKNOWN" = "UNKNOWN";
     let socialMediaName = "UNKNOWN";
     //TODO: other social media names
@@ -103,39 +93,35 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
     }
 
     if (shouldCheckDeepfake) {
-      const response = await detectDeepfake(hostedUrl);
-      console.log("response", response);
-      deepfakePredictions = response?.predictions;
-      if (deepfakePredictions && deepfakePredictions?.length) {
-        result = deepfakePredictions[0].class.toLocaleUpperCase() as
-          | "FAKE"
-          | "REAL";
-        setDeepfakePredictionResult({
-          result: result,
-          confidence: deepfakePredictions[0].confidence,
-        });
-        // if (result === "FAKE") {
-        //   setProcessingStatus("COMPLETED");
-        //   return;
-        // }
-      } else if (result === "UNKNOWN") {
-        setDeepfakePredictionResult({
-          result: "UNKNOWN",
-          confidence: 0,
-        });
+      try {
+        const response = await detectDeepfake(hostedUrl);
+        deepfakePredictions = response?.predictions;
+        if (deepfakePredictions && deepfakePredictions?.length) {
+          result = deepfakePredictions[0].class.toLocaleUpperCase() as
+            | "FAKE"
+            | "REAL";
+          setDeepfakePredictionResult({
+            result: result,
+            confidence: deepfakePredictions[0].confidence,
+          });
+          // if (result === "FAKE") {
+          //   setProcessingStatus("COMPLETED");
+          //   return;
+          // }
+        } else if (result === "UNKNOWN") {
+          setDeepfakePredictionResult({
+            result: "UNKNOWN",
+            confidence: 0,
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        setError("Error checking for deepfake");
+        setProcessingStatus("COMPLETED");
+        return;
       }
     }
 
-    //TODO: add timeout?
-    // if (shouldRecognizeFace) {
-    //   const { recognizedFaces, boundingBoxOverlaySrc } = await recognizeFace(
-    //     hostedUrl
-    //   );
-    //   console.log("recogn", recognizedFaces);
-    //   recognizedFace = recognizedFaces ? recognizedFaces[0] : "UNKNOWN";
-    //   setRecognizedFaces(recognizedFaces);
-    //   setboundingBoxOverlaySrc(boundingBoxOverlaySrc);
-    // }
     if (shouldSearchRelatedResults) {
       const res = await searchRelatedResults(hostedUrl);
       res?.image_results &&
@@ -148,12 +134,11 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
         );
     }
     const confidence =
-      (deepfakePredictions && deepfakePredictions[0].confidence) || undefined;
+      (deepfakePredictions && deepfakePredictions[0]?.confidence) || undefined;
     await saveCheckResultData({
       imageUrl: hostedUrl,
       confidence,
       socialMediaName,
-      // recognizedFace,
       result,
     });
 
@@ -175,9 +160,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
           setError(null);
           setImage(null);
           setImageSrc(null);
-          // setRecognizedFaces(null);
           setRelatedResults(null);
-          setboundingBoxOverlaySrc(null);
           setProcessingStatus("IDLE");
           setDeepfakePredictionResult(null);
         }}
@@ -199,7 +182,6 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
               onStartRequest({
                 image,
                 imageSrc,
-                // shouldRecognizeFace,
                 shouldCheckDeepfake,
                 shouldSearchRelatedResults,
               })

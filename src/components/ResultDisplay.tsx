@@ -4,8 +4,6 @@ import { useRecoilValue } from "recoil";
 import {
   deepfakePredictionResultState,
   searchResultsState,
-  // recognizedFacesState,
-  // shouldRecognizeFaceState,
 } from "../recoil/state";
 
 const ResultDisplay = () => {
@@ -14,49 +12,10 @@ const ResultDisplay = () => {
   );
 
   const relatedResults = useRecoilValue(searchResultsState);
-  // const shouldRecognizeFace = useRecoilValue(shouldRecognizeFaceState);
 
-  // const recognizedFaces = useRecoilValue(recognizedFacesState);
   return (
     <Container pb="5">
       <Stack gap={5} px="3" pb="5" borderColor={"blue.300"}>
-        {/* <Box>
-          {!recognizedFaces &&
-            processingStatus === "COMPLETED" &&
-            shouldRecognizeFace && (
-              <Text fontSize={"xl"}>No faces were found in the image</Text>
-            )}
-          {recognizedFaces && (
-            <Flex fontSize="xl" fontWeight={"350"}>
-              {recognizedFaces.every(
-                (name) => name.toLocaleUpperCase() === "UNKNOWN"
-              ) ? (
-                <Text>Could not recognize the found faces</Text>
-              ) : (
-                <Box>
-                  <Text
-                    _dark={{ color: "blue.100" }}
-                    _light={{ color: "blue.900" }}
-                    mt={3}
-                    mb={1}
-                  >
-                    Recognized faces:{" "}
-                  </Text>
-                  <Stack>
-                    {recognizedFaces.map((name) => (
-                      <Flex key={name} alignItems={"center"} gap={5}>
-                        <Text fontSize="3xl" fontWeight={400} key={name}>
-                          {name}
-                        </Text>
-                        <PersonThumbnail name={name} />
-                      </Flex>
-                    ))}
-                  </Stack>
-                </Box>
-              )}
-            </Flex>
-          )}
-        </Box> */}
         {deepfakePredictionResult && (
           <Box>
             {deepfakePredictionResult.result === "FAKE" ? (
@@ -93,7 +52,6 @@ const ResultDisplay = () => {
                 borderLeftColor={"orange.600"}
               >
                 Could not conclusively determine if this image is AI-generated
-                (meaning it is likelier to be real than fake)
               </Text>
             )}
           </Box>
