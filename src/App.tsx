@@ -11,7 +11,7 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 import { Outlet } from "react-router-dom";
 
-function MainScreen() {
+function App() {
   const { toggleColorMode, colorMode } = useColorMode();
   return (
     <Stack maxWidth="100vw">
@@ -31,4 +31,4 @@ function MainScreen() {
   );
 }
 
-export default MainScreen;
+export default App;
