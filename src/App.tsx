@@ -24,11 +24,9 @@ function MainScreen() {
           }}
         ></Switch>
       </Flex>
-      {/* <ErrorBoundary> */}
       <Center>
         <Outlet />
       </Center>
-      {/* </ErrorBoundary> */}
     </Stack>
   );
 }
