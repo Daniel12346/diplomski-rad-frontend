@@ -41,8 +41,8 @@ const ImageInputArea = () => {
       const img = imgRef.current;
       const canvas = canvasRef.current;
       const displaySize = { width: img.width, height: img.height };
-      faceapi.matchDimensions(canvas, displaySize);
       try {
+        faceapi.matchDimensions(canvas, displaySize);
         const detections = await faceapi.detectAllFaces(img);
         const resizedDetections = faceapi.resizeResults(
           detections,
@@ -52,9 +52,11 @@ const ImageInputArea = () => {
         if (resizedDetections.length === 0) {
           throw new Error("No faces detected in the image");
         }
+        //TODO: fix getting canvas context
         canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
       } catch (e) {
+        console.error(e);
         throw new Error("Could not detect faces in the image");
       }
     }
@@ -180,9 +182,28 @@ const ImageInputArea = () => {
             cursor={"pointer"}
             onClick={() => {
               const url = fileInputRef.current?.value;
-              if (url) {
-                setImageSrc(url);
+              if (!url) {
+                // setError("Please enter a valid URL");
+                return;
               }
+              //converting the image to base64
+              const toDataURL = (url: string) =>
+                fetch(url)
+                  .then((response) => response.blob())
+                  .then(
+                    (blob) =>
+                      new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          resolve(reader.result);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                      })
+                  );
+              toDataURL(url).then((res) => {
+                setImageSrc(res as string);
+              });
             }}
           >
             <ArrowForwardIcon boxSize={8} color="blue.100" bg="blue.500" />
