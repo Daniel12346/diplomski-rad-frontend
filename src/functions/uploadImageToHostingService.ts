@@ -1,28 +1,28 @@
 import axios from "axios";
 
-const uploadImageToHostingService = async (imageUrl: string) => {
-  if (imageUrl) {
-    const regex = /^data:image\/(png|jpeg|jpg);base64,/;
-    let shortenedBase64Url = imageUrl.replace(regex, "");
-    const body = new FormData();
-    body.append("image", shortenedBase64Url);
-    // body.append("expiration", "300");
-
-    try {
-      const { data } = await axios.post(
-        import.meta.env.VITE_IMAGE_HOSTING_API_URL +
-          `?key=${import.meta.env.VITE_IMAGE_HOSTING_API_KEY}`,
-        body,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      return data.data.url;
-    } catch (error) {
-      throw error;
-    }
+const uploadImageToHostingService = async (
+  // file: File | null,
+  dataUrl: string | null
+) => {
+  const body = new FormData();
+  // if (file) {
+  //   body.append("image", file);
+  // }
+  if (dataUrl) {
+    body.append("imagePath", dataUrl);
+  }
+  try {
+    const { data } = await axios({
+      method: "POST",
+      url: import.meta.env.VITE_IMAGE_UPLOAD_URL,
+      data: body,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return data.imageUrl;
+  } catch (error) {
+    throw error;
   }
 };
 
