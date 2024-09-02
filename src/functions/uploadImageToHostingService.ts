@@ -4,13 +4,15 @@ const uploadImageToHostingService = async (
   // file: File | null,
   dataUrl: string | null
 ) => {
+  if (!dataUrl) {
+    throw new Error("No image data provided to upload");
+  }
   const body = new FormData();
+  body.append("imagePath", dataUrl);
   // if (file) {
   //   body.append("image", file);
   // }
-  if (dataUrl) {
-    body.append("imagePath", dataUrl);
-  }
+
   try {
     const { data } = await axios({
       method: "POST",
@@ -20,8 +22,10 @@ const uploadImageToHostingService = async (
         "Content-Type": "multipart/form-data",
       },
     });
-    return data.imageUrl;
+    console.log("data", data);
+    return data.secure_url;
   } catch (error) {
+    console.log("error", error);
     throw error;
   }
 };
