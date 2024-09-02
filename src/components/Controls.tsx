@@ -61,22 +61,21 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
 
     if (!image && !imageSrc) return;
 
-    let hostedUrl = imageSrc;
+    let hostedUrl = null;
     try {
       await detectFaces();
     } catch (e) {
       setError("Could not detect faces in the image");
     }
     try {
-      if (imageSrc) {
-        hostedUrl = await uploadImageToHostingService(imageSrc);
-      }
-
+      hostedUrl = await uploadImageToHostingService(imageSrc);
       if (!hostedUrl) {
         setProcessingStatus("COMPLETED");
+        setError("Error uploading image");
         return;
       }
     } catch (err) {
+      console.error(err);
       setError("Error uploading image");
       setProcessingStatus("COMPLETED");
       return;
@@ -104,10 +103,6 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
             result: result,
             confidence: deepfakePredictions[0].confidence,
           });
-          // if (result === "FAKE") {
-          //   setProcessingStatus("COMPLETED");
-          //   return;
-          // }
         } else if (result === "UNKNOWN") {
           setDeepfakePredictionResult({
             result: "UNKNOWN",
