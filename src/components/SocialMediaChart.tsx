@@ -31,7 +31,7 @@ const SocialMediaChart = () => {
     return <div>No social media stats</div>;
   }
   const data = {
-    labels: socialMediaStats.map((stat) => stat._id),
+    labels: socialMediaStats.map((stat) => stat._id.toLocaleUpperCase()),
     datasets: [
       {
         label: "Social Media Stats",

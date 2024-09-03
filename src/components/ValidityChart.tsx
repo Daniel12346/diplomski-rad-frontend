@@ -34,7 +34,7 @@ const ValidityChart = () => {
     return <div>No validity stats</div>;
   }
   const data = {
-    labels: ["Fake", "Real", "Unknown"],
+    labels: ["FAKE", "REAL", "UNKNOWN"],
     datasets: [
       {
         label: "Validity Stats",
