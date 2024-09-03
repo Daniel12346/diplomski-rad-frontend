@@ -201,9 +201,13 @@ const ImageInputArea = () => {
                         reader.readAsDataURL(blob);
                       })
                   );
-              toDataURL(url).then((res) => {
-                setImageSrc(res as string);
-              });
+              toDataURL(url)
+                .then((res) => {
+                  setImageSrc(res as string);
+                })
+                .catch((e) => {
+                  setError("Image could not be loaded");
+                });
             }}
           >
             <ArrowForwardIcon boxSize={8} color="blue.100" bg="blue.500" />
