@@ -75,7 +75,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
         return;
       }
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setError("Error uploading image");
       setProcessingStatus("COMPLETED");
       return;
@@ -110,7 +110,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
           });
         }
       } catch (e) {
-        console.error(e);
+        console.log(e);
         setError("Error checking for deepfake");
         setProcessingStatus("COMPLETED");
         return;

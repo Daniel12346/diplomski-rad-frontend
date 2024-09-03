@@ -56,7 +56,7 @@ const ImageInputArea = () => {
         canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
       } catch (e) {
-        console.error(e);
+        console.log(e);
         throw new Error("Could not detect faces in the image");
       }
     }
@@ -68,7 +68,7 @@ const ImageInputArea = () => {
         await faceapi.loadSsdMobilenetv1Model("/models");
         await faceapi.loadFaceLandmarkModel(MODEL_URL);
       } catch (e) {
-        console.error(e);
+        console.log(e);
       }
     };
     loadModels();
