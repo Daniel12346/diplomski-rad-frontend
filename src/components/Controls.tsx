@@ -118,24 +118,35 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
     }
 
     if (shouldSearchRelatedResults) {
-      const res = await searchRelatedResults(hostedUrl);
-      res?.image_results &&
-        setRelatedResults(
-          res.image_results.map((result: any) => ({
-            title: result.title,
-            favicon: result.favicon,
-            redirect_link: result.redirect_link,
-          }))
-        );
+      try {
+        const res = await searchRelatedResults(hostedUrl);
+        res?.image_results &&
+          setRelatedResults(
+            res.image_results.map((result: any) => ({
+              title: result.title,
+              favicon: result.favicon,
+              redirect_link: result.redirect_link,
+            }))
+          );
+      } catch (e) {
+        setError("Error searching for related results");
+        setProcessingStatus("COMPLETED");
+        return;
+      }
     }
     const confidence =
       (deepfakePredictions && deepfakePredictions[0]?.confidence) || undefined;
-    await saveCheckResultData({
-      imageUrl: hostedUrl,
-      confidence,
-      socialMediaName,
-      result,
-    });
+    try {
+      await saveCheckResultData({
+        imageUrl: hostedUrl,
+        confidence,
+        socialMediaName,
+        result,
+      });
+    } catch (e) {
+      setError("Error saving result data");
+      setProcessingStatus("COMPLETED");
+    }
 
     setProcessingStatus("COMPLETED");
   };
