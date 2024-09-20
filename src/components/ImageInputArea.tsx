@@ -19,6 +19,7 @@ import {
   imageSrcState,
   imageState,
   processingStatusState,
+  originalImageUrlState,
 } from "../recoil/state";
 import Controls from "./Controls";
 import { FileUploader } from "react-drag-drop-files";
@@ -34,6 +35,7 @@ const ImageInputArea = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
   const setProcessingStatus = useSetRecoilState(processingStatusState);
+  const setOriginalImageUrl = useSetRecoilState(originalImageUrlState);
 
   const detectFaces = async () => {
     if (imgRef.current && canvasRef.current) {
@@ -52,7 +54,6 @@ const ImageInputArea = () => {
         if (resizedDetections.length === 0) {
           throw new Error("No faces detected in the image");
         }
-        //TODO: fix getting canvas context
         canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
       } catch (e) {
@@ -75,17 +76,6 @@ const ImageInputArea = () => {
   }, []);
   useEffect(() => {
     if (image) {
-      //TODO: check if image is too large
-      // console.log(image.size, image.size / 1024);
-      // if (image.size / 1024 > 20) {
-      //   console.log("file too large");
-      //   setError("File too large. Please upload a smaller file.");
-      //   return;
-      // } else {
-      //   if (error) {
-      //     setError(null);
-      //   }
-      // }
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result as string);
@@ -203,9 +193,11 @@ const ImageInputArea = () => {
                   );
               toDataURL(url)
                 .then((res) => {
+                  setOriginalImageUrl(url);
                   setImageSrc(res as string);
                 })
                 .catch((e) => {
+                  console.log(e);
                   setError("Image could not be loaded");
                 });
             }}

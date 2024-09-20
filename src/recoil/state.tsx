@@ -75,3 +75,8 @@ export const resultHistoryState = atom<ResultHistory | null>({
   key: "resultHistoryState",
   default: null,
 });
+
+export const originalImageUrlState = atom<string | null>({
+  key: "originalImageUrlState",
+  default: null,
+});

@@ -6,7 +6,7 @@ import {
   Circle,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   imageState,
   imageSrcState,
@@ -15,6 +15,7 @@ import {
   deepfakePredictionResultState,
   shouldCheckDeepfakeState,
   shouldSearchRelatedResultsState,
+  originalImageUrlState,
 } from "../recoil/state";
 import detectDeepfake from "../functions/detectDeepfake";
 import searchRelatedResults from "../functions/searchRelatedResults";
@@ -43,10 +44,14 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
     deepfakePredictionResultState
   );
   const controlsBgColor = useColorModeValue("blue.100", "blue.800");
+  const [originalImageUrl, setOriginalImageUrl] = useRecoilState(
+    originalImageUrlState
+  );
 
   interface RequestParams {
     image: File | null;
     imageSrc: string | null;
+    originalImageUrl: string | null;
     // shouldRecognizeFace: boolean;
     shouldCheckDeepfake: boolean;
     shouldSearchRelatedResults: boolean;
@@ -54,6 +59,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
   const onStartRequest = async ({
     image,
     imageSrc,
+    originalImageUrl,
     shouldCheckDeepfake,
     shouldSearchRelatedResults,
   }: RequestParams) => {
@@ -70,9 +76,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
     try {
       hostedUrl = await uploadImageToHostingService(imageSrc);
       if (!hostedUrl) {
-        setProcessingStatus("COMPLETED");
-        setError("Error uploading image");
-        return;
+        throw new Error("Error uploading image");
       }
     } catch (err) {
       console.log(err);
@@ -85,8 +89,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
 
     let result: "FAKE" | "REAL" | "UNKNOWN" = "UNKNOWN";
     let socialMediaName = "UNKNOWN";
-    //TODO: other social media names
-    let match = imageSrc?.match(/facebook|twitter|x\.com|instagram/gi);
+    let match = originalImageUrl?.match(/facebook|twitter|x\.com|instagram/gi);
     if (match) {
       socialMediaName = match[0];
     }
@@ -166,6 +169,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
           setError(null);
           setImage(null);
           setImageSrc(null);
+          setOriginalImageUrl(null);
           setRelatedResults(null);
           setProcessingStatus("IDLE");
           setDeepfakePredictionResult(null);
@@ -188,6 +192,7 @@ const Controls = ({ detectFaces, setError }: ControlsProps) => {
               onStartRequest({
                 image,
                 imageSrc,
+                originalImageUrl,
                 shouldCheckDeepfake,
                 shouldSearchRelatedResults,
               })
